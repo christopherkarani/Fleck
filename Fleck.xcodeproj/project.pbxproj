@@ -7,21 +7,37 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BB11DDF81F9E395F004A2D2E /* LoginController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB11DDF71F9E395F004A2D2E /* LoginController.swift */; };
+		BB11DDFC1F9E3A4C004A2D2E /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB11DDFB1F9E3A4C004A2D2E /* HomeViewController.swift */; };
+		BB11DDFE1F9E5BCC004A2D2E /* NavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB11DDFD1F9E5BCC004A2D2E /* NavigationController.swift */; };
+		BB11DE001F9E5C1A004A2D2E /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB11DDFF1F9E5C1A004A2D2E /* ChatViewController.swift */; };
+		BB11DE021F9E5C63004A2D2E /* ConversationsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB11DE011F9E5C63004A2D2E /* ConversationsController.swift */; };
+		BB11DE051F9E67A9004A2D2E /* Global.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB11DE041F9E67A9004A2D2E /* Global.swift */; };
 		BBD0D2E41F9BB51400D996A2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBD0D2E31F9BB51400D996A2 /* AppDelegate.swift */; };
-		BBD0D2E61F9BB51400D996A2 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBD0D2E51F9BB51400D996A2 /* ViewController.swift */; };
 		BBD0D2E91F9BB51400D996A2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BBD0D2E71F9BB51400D996A2 /* Main.storyboard */; };
 		BBD0D2EB1F9BB51400D996A2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BBD0D2EA1F9BB51400D996A2 /* Assets.xcassets */; };
 		BBD0D2EE1F9BB51400D996A2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BBD0D2EC1F9BB51400D996A2 /* LaunchScreen.storyboard */; };
+		BBE983321F9F5A14009BE2D7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = BBE983311F9F5A14009BE2D7 /* GoogleService-Info.plist */; };
+		C28FF4C6EC26175CC32BABCC /* Pods_Fleck.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AF5CDCA7F3928D485FFF4A6 /* Pods_Fleck.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3AF5CDCA7F3928D485FFF4A6 /* Pods_Fleck.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Fleck.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		86684BF9ECCDBC74E8CEECF8 /* Pods-Fleck.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Fleck.release.xcconfig"; path = "Pods/Target Support Files/Pods-Fleck/Pods-Fleck.release.xcconfig"; sourceTree = "<group>"; };
+		BB11DDF71F9E395F004A2D2E /* LoginController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginController.swift; sourceTree = "<group>"; };
+		BB11DDFB1F9E3A4C004A2D2E /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
+		BB11DDFD1F9E5BCC004A2D2E /* NavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationController.swift; sourceTree = "<group>"; };
+		BB11DDFF1F9E5C1A004A2D2E /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
+		BB11DE011F9E5C63004A2D2E /* ConversationsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationsController.swift; sourceTree = "<group>"; };
+		BB11DE041F9E67A9004A2D2E /* Global.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Global.swift; sourceTree = "<group>"; };
 		BBD0D2E01F9BB51400D996A2 /* Fleck.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Fleck.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBD0D2E31F9BB51400D996A2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		BBD0D2E51F9BB51400D996A2 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		BBD0D2E81F9BB51400D996A2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		BBD0D2EA1F9BB51400D996A2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BBD0D2ED1F9BB51400D996A2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		BBD0D2EF1F9BB51400D996A2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		BBE983311F9F5A14009BE2D7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		E171F67C6886D78CE2AB86B7 /* Pods-Fleck.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Fleck.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Fleck/Pods-Fleck.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -29,17 +45,53 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C28FF4C6EC26175CC32BABCC /* Pods_Fleck.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2491C7EDECD592443891DC2A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				3AF5CDCA7F3928D485FFF4A6 /* Pods_Fleck.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		A5A5596BBFADD55953CF6836 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				E171F67C6886D78CE2AB86B7 /* Pods-Fleck.debug.xcconfig */,
+				86684BF9ECCDBC74E8CEECF8 /* Pods-Fleck.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		BB06642A1F9F2F3A00420DDA /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				BBE983311F9F5A14009BE2D7 /* GoogleService-Info.plist */,
+			);
+			path = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		BB11DE031F9E6789004A2D2E /* Helper */ = {
+			isa = PBXGroup;
+			children = (
+				BB11DE041F9E67A9004A2D2E /* Global.swift */,
+			);
+			path = Helper;
+			sourceTree = "<group>";
+		};
 		BBD0D2D71F9BB51300D996A2 = {
 			isa = PBXGroup;
 			children = (
 				BBD0D2E21F9BB51400D996A2 /* Fleck */,
 				BBD0D2E11F9BB51400D996A2 /* Products */,
+				A5A5596BBFADD55953CF6836 /* Pods */,
+				2491C7EDECD592443891DC2A /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -54,14 +106,28 @@
 		BBD0D2E21F9BB51400D996A2 /* Fleck */ = {
 			isa = PBXGroup;
 			children = (
+				BB06642A1F9F2F3A00420DDA /* Supporting Files */,
+				BB11DE031F9E6789004A2D2E /* Helper */,
+				BBD0D2F51F9BBF1200D996A2 /* Controllers */,
 				BBD0D2E31F9BB51400D996A2 /* AppDelegate.swift */,
-				BBD0D2E51F9BB51400D996A2 /* ViewController.swift */,
 				BBD0D2E71F9BB51400D996A2 /* Main.storyboard */,
 				BBD0D2EA1F9BB51400D996A2 /* Assets.xcassets */,
 				BBD0D2EC1F9BB51400D996A2 /* LaunchScreen.storyboard */,
 				BBD0D2EF1F9BB51400D996A2 /* Info.plist */,
 			);
 			path = Fleck;
+			sourceTree = "<group>";
+		};
+		BBD0D2F51F9BBF1200D996A2 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				BB11DDF71F9E395F004A2D2E /* LoginController.swift */,
+				BB11DDFF1F9E5C1A004A2D2E /* ChatViewController.swift */,
+				BB11DDFB1F9E3A4C004A2D2E /* HomeViewController.swift */,
+				BB11DDFD1F9E5BCC004A2D2E /* NavigationController.swift */,
+				BB11DE011F9E5C63004A2D2E /* ConversationsController.swift */,
+			);
+			path = Controllers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -71,9 +137,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = BBD0D2F21F9BB51400D996A2 /* Build configuration list for PBXNativeTarget "Fleck" */;
 			buildPhases = (
+				3C8547824078C47655499D3B /* [CP] Check Pods Manifest.lock */,
 				BBD0D2DC1F9BB51400D996A2 /* Sources */,
 				BBD0D2DD1F9BB51400D996A2 /* Frameworks */,
 				BBD0D2DE1F9BB51400D996A2 /* Resources */,
+				7CC06383774226C4BDFE333F /* [CP] Embed Pods Frameworks */,
+				A66A80FF42C9140D72A104E3 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -124,6 +193,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BBD0D2EE1F9BB51400D996A2 /* LaunchScreen.storyboard in Resources */,
+				BBE983321F9F5A14009BE2D7 /* GoogleService-Info.plist in Resources */,
 				BBD0D2EB1F9BB51400D996A2 /* Assets.xcassets in Resources */,
 				BBD0D2E91F9BB51400D996A2 /* Main.storyboard in Resources */,
 			);
@@ -131,13 +201,66 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		3C8547824078C47655499D3B /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		7CC06383774226C4BDFE333F /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Fleck/Pods-Fleck-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A66A80FF42C9140D72A104E3 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Fleck/Pods-Fleck-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		BBD0D2DC1F9BB51400D996A2 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BBD0D2E61F9BB51400D996A2 /* ViewController.swift in Sources */,
+				BB11DDFC1F9E3A4C004A2D2E /* HomeViewController.swift in Sources */,
+				BB11DE021F9E5C63004A2D2E /* ConversationsController.swift in Sources */,
+				BB11DDF81F9E395F004A2D2E /* LoginController.swift in Sources */,
+				BB11DDFE1F9E5BCC004A2D2E /* NavigationController.swift in Sources */,
 				BBD0D2E41F9BB51400D996A2 /* AppDelegate.swift in Sources */,
+				BB11DE001F9E5C1A004A2D2E /* ChatViewController.swift in Sources */,
+				BB11DE051F9E67A9004A2D2E /* Global.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -272,6 +395,7 @@
 		};
 		BBD0D2F31F9BB51400D996A2 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = E171F67C6886D78CE2AB86B7 /* Pods-Fleck.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -287,6 +411,7 @@
 		};
 		BBD0D2F41F9BB51400D996A2 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 86684BF9ECCDBC74E8CEECF8 /* Pods-Fleck.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
