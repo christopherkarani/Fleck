@@ -7,9 +7,23 @@
 //
 
 import UIKit
+import Firebase
 
 extension UIColor {
     convenience init(r: CGFloat, g: CGFloat, b: CGFloat) {
         self.init(red: r/255, green: g/255, blue: b/255, alpha: 1)
+    }
+}
+
+
+//Contains Firbase DB Node Names
+enum FDNodeName: String {
+    case users
+    
+    func returnRootNode() -> DatabaseReference {
+        return Database.database().reference()
+    }
+    static func userNode() -> String {
+        return "users"
     }
 }
