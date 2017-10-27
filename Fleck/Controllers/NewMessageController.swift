@@ -19,20 +19,21 @@ class NewMessageController: UITableViewController {
         tableView.delegate = self
         tableView.dataSource = self
         setupNavigationItem()
-
+        tableView.register(UserCell.self, forCellReuseIdentifier: cellID)
     }
     
     func fetchUsers() {
         let ref = Database.database().reference().child(FDNodeName.userNode())
         ref.observe(.childAdded) { (snapshot) in
             if let dictionary = snapshot.value as? [String: AnyObject] {
-                
-                let email = dictionary["email"] as? String
-                let name = dictionary["name"] as? String
-                let user = LocalUser(name: name!, email: email!)
+                var user = LocalUser()
+                user.name = dictionary["name"] as? String
+                user.email = dictionary["email"] as? String
                 self.users.append(user)
-                self.tableView.reloadData()
                 
+                DispatchQueue.main.async(execute: {
+                    self.tableView.reloadData()
+                }) 
             }
         }
         
@@ -53,7 +54,7 @@ extension NewMessageController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         print(users.count)
         let myUser = users[indexPath.row]
-        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: cellID)
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellID) as! UserCell
         cell.textLabel?.text = myUser.name
         cell.detailTextLabel?.text = myUser.email
         

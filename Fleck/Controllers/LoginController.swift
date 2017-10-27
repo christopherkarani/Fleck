@@ -81,13 +81,19 @@ class LoginViewController : UIViewController {
         return textField
     }()
     
-    var profileImageSelector: UIImageView = {
+    lazy var profileImageSelector: UIImageView = {
        let imageView = UIImageView()
         imageView.image = UIImage(named: "EmptyProfileIcon")
         imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.isUserInteractionEnabled = true
+        let tap = UITapGestureRecognizer(target: self, action: #selector(handleProfileImagePicker))
+        imageView.addGestureRecognizer(tap)
+        imageView.layer.masksToBounds = true
+        imageView.layer.cornerRadius = 75
         return imageView
     }()
     
+
     
     //MARK: SEGMENTED CONTROL
     lazy var loginRegisterSegementedControl : UISegmentedControl = {
@@ -122,76 +128,7 @@ class LoginViewController : UIViewController {
     }
     
     
-    //MARK: LOGIN FUNCTIONALITY
-    @objc func handleLoginRegister() {
-        if loginRegisterSegementedControl.selectedSegmentIndex == 0 {
-            handleLogin()
-        } else {
-            handleRegister()
-        }
-    }
-    
-    func handleLogin() {
-        guard let email = emailTextField.text else {
-            print("Invaid Email")
-            return
-        }
-        guard let password = passwordTextField.text else {
-            print("Invalid Password")
-            return
-        }
-        Auth.auth().signIn(withEmail: email, password: password) { (user, error) in
-            if error != nil {
-                print(error!)
-            }
-            print("Succesfully Logged in")
-            self.dismiss(animated: true, completion: nil)
-            
-        }
-    }
-    
-    func handleRegister() {
-        guard let email = emailTextField.text else {
-            print("Invaid Email")
-            return
-        }
-        guard let password = passwordTextField.text else {
-            print("Invalid Password")
-            return
-        }
-        guard let name = nameTextField.text else {
-            print("No valid name")
-            return
-        }
-        
-        Auth.auth().createUser(withEmail: email, password: password) { (user: User?, error) in
-            
-            if error != nil {
-                print(error!)
-                return
-            }
-            guard let uid = user?.uid else {
-                fatalError("No user ID provided during auth")
-            }
-            
-            //Register Users to database
-            let ref = Database.database().reference()
-            let usersRef = ref.child(FDNodeName.userNode()).child(uid)
-            let values = ["name": name, "email": email]
-            usersRef.updateChildValues(values, withCompletionBlock: { (err, ref) in
-                if err != nil {
-                    print(error!)
-                    return
-                }
-                
-                print("Success Authenticating user to server")
-                
-                self.dismiss(animated: true, completion: nil)
-            })
-            
-        }
-    }
-    
+  
     //MARK: CONSTRAINTS
     private func handleConstraints () {
 

@@ -15,6 +15,8 @@
 		BB11DE051F9E67A9004A2D2E /* Global.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB11DE041F9E67A9004A2D2E /* Global.swift */; };
 		BB18647C1FA21DBB00CAC6AD /* NewMessageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB18647B1FA21DBB00CAC6AD /* NewMessageController.swift */; };
 		BB18647F1FA2294100CAC6AD /* LocalUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB18647E1FA2294100CAC6AD /* LocalUser.swift */; };
+		BB1864821FA24F3400CAC6AD /* UserCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1864811FA24F3400CAC6AD /* UserCell.swift */; };
+		BB1864841FA2727500CAC6AD /* LoginController+Handlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1864831FA2727400CAC6AD /* LoginController+Handlers.swift */; };
 		BBD0D2E41F9BB51400D996A2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBD0D2E31F9BB51400D996A2 /* AppDelegate.swift */; };
 		BBD0D2E91F9BB51400D996A2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BBD0D2E71F9BB51400D996A2 /* Main.storyboard */; };
 		BBD0D2EB1F9BB51400D996A2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BBD0D2EA1F9BB51400D996A2 /* Assets.xcassets */; };
@@ -34,6 +36,8 @@
 		BB11DE041F9E67A9004A2D2E /* Global.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Global.swift; sourceTree = "<group>"; };
 		BB18647B1FA21DBB00CAC6AD /* NewMessageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMessageController.swift; sourceTree = "<group>"; };
 		BB18647E1FA2294100CAC6AD /* LocalUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalUser.swift; sourceTree = "<group>"; };
+		BB1864811FA24F3400CAC6AD /* UserCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCell.swift; sourceTree = "<group>"; };
+		BB1864831FA2727400CAC6AD /* LoginController+Handlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LoginController+Handlers.swift"; sourceTree = "<group>"; };
 		BBD0D2E01F9BB51400D996A2 /* Fleck.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Fleck.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBD0D2E31F9BB51400D996A2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		BBD0D2E81F9BB51400D996A2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -85,6 +89,7 @@
 			isa = PBXGroup;
 			children = (
 				BB11DE041F9E67A9004A2D2E /* Global.swift */,
+				BB1864831FA2727400CAC6AD /* LoginController+Handlers.swift */,
 			);
 			path = Helper;
 			sourceTree = "<group>";
@@ -95,6 +100,14 @@
 				BB18647E1FA2294100CAC6AD /* LocalUser.swift */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		BB1864801FA24F1700CAC6AD /* View */ = {
+			isa = PBXGroup;
+			children = (
+				BB1864811FA24F3400CAC6AD /* UserCell.swift */,
+			);
+			path = View;
 			sourceTree = "<group>";
 		};
 		BBD0D2D71F9BB51300D996A2 = {
@@ -118,6 +131,7 @@
 		BBD0D2E21F9BB51400D996A2 /* Fleck */ = {
 			isa = PBXGroup;
 			children = (
+				BB1864801FA24F1700CAC6AD /* View */,
 				BB18647D1FA2292C00CAC6AD /* Model */,
 				BB06642A1F9F2F3A00420DDA /* Supporting Files */,
 				BB11DE031F9E6789004A2D2E /* Helper */,
@@ -271,11 +285,13 @@
 				BB18647C1FA21DBB00CAC6AD /* NewMessageController.swift in Sources */,
 				BB11DDFC1F9E3A4C004A2D2E /* HomeViewController.swift in Sources */,
 				BB11DE021F9E5C63004A2D2E /* ConversationsController.swift in Sources */,
+				BB1864841FA2727500CAC6AD /* LoginController+Handlers.swift in Sources */,
 				BB11DDF81F9E395F004A2D2E /* LoginController.swift in Sources */,
 				BB11DDFE1F9E5BCC004A2D2E /* NavigationController.swift in Sources */,
 				BB18647F1FA2294100CAC6AD /* LocalUser.swift in Sources */,
 				BBD0D2E41F9BB51400D996A2 /* AppDelegate.swift in Sources */,
 				BB11DE001F9E5C1A004A2D2E /* ChatViewController.swift in Sources */,
+				BB1864821FA24F3400CAC6AD /* UserCell.swift in Sources */,
 				BB11DE051F9E67A9004A2D2E /* Global.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
