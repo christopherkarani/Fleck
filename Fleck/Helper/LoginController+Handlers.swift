@@ -96,6 +96,7 @@ extension LoginViewController {
                 return
             }
             
+            
             guard let imageData = UIImagePNGRepresentation(self.profileImageSelector.image!) else {
                 print("Image to PNG Error")
                 return
