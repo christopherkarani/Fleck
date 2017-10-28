@@ -22,6 +22,7 @@
 		BBD0D2EB1F9BB51400D996A2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BBD0D2EA1F9BB51400D996A2 /* Assets.xcassets */; };
 		BBD0D2EE1F9BB51400D996A2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BBD0D2EC1F9BB51400D996A2 /* LaunchScreen.storyboard */; };
 		BBE983321F9F5A14009BE2D7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = BBE983311F9F5A14009BE2D7 /* GoogleService-Info.plist */; };
+		BBF81E6A1FA4CA4C00CFD93D /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBF81E691FA4CA4C00CFD93D /* Extensions.swift */; };
 		C28FF4C6EC26175CC32BABCC /* Pods_Fleck.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AF5CDCA7F3928D485FFF4A6 /* Pods_Fleck.framework */; };
 /* End PBXBuildFile section */
 
@@ -45,6 +46,7 @@
 		BBD0D2ED1F9BB51400D996A2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		BBD0D2EF1F9BB51400D996A2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BBE983311F9F5A14009BE2D7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		BBF81E691FA4CA4C00CFD93D /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		E171F67C6886D78CE2AB86B7 /* Pods-Fleck.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Fleck.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Fleck/Pods-Fleck.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -90,6 +92,7 @@
 			children = (
 				BB11DE041F9E67A9004A2D2E /* Global.swift */,
 				BB1864831FA2727400CAC6AD /* LoginController+Handlers.swift */,
+				BBF81E691FA4CA4C00CFD93D /* Extensions.swift */,
 			);
 			path = Helper;
 			sourceTree = "<group>";
@@ -289,6 +292,7 @@
 				BB11DDF81F9E395F004A2D2E /* LoginController.swift in Sources */,
 				BB11DDFE1F9E5BCC004A2D2E /* NavigationController.swift in Sources */,
 				BB18647F1FA2294100CAC6AD /* LocalUser.swift in Sources */,
+				BBF81E6A1FA4CA4C00CFD93D /* Extensions.swift in Sources */,
 				BBD0D2E41F9BB51400D996A2 /* AppDelegate.swift in Sources */,
 				BB11DE001F9E5C1A004A2D2E /* ChatViewController.swift in Sources */,
 				BB1864821FA24F3400CAC6AD /* UserCell.swift in Sources */,

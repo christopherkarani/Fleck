@@ -11,4 +11,5 @@ import Foundation
 struct LocalUser {
     var name: String?
     var email: String?
+    var profileImageURL: String?
 }

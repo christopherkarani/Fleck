@@ -29,6 +29,7 @@ class NewMessageController: UITableViewController {
                 var user = LocalUser()
                 user.name = dictionary["name"] as? String
                 user.email = dictionary["email"] as? String
+                user.profileImageURL = dictionary["profileImageUrl"] as? String
                 self.users.append(user)
                 
                 DispatchQueue.main.async(execute: {
@@ -52,12 +53,23 @@ class NewMessageController: UITableViewController {
 //MARK: DELEGATE
 extension NewMessageController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        print(users.count)
         let myUser = users[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: cellID) as! UserCell
         cell.textLabel?.text = myUser.name
         cell.detailTextLabel?.text = myUser.email
-        
+        if let profileImageURL = myUser.profileImageURL {
+            let url = URL(string: profileImageURL)
+            
+            URLSession.shared.dataTask(with: url!, completionHandler: { (data, response, error) in
+                if error != nil {
+                    print(error!)
+                }
+                
+                DispatchQueue.main.async {
+                    cell.profileImageView.image = UIImage(data: data!)
+                }
+            }).resume()
+        }
         return cell
     }
 }
@@ -66,5 +78,9 @@ extension NewMessageController {
 extension NewMessageController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return users.count
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 60
     }
 }

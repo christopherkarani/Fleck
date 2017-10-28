@@ -10,16 +10,29 @@ import UIKit
 import Firebase
 
 class ConversationsController: UITableViewController {
-
+    
+    var navigationTitile: String? {
+        didSet {
+            navigationItem.title = navigationTitile!
+        }
+    }
+    //MARK: VIEWDIDLOAD
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
        
         setupNavigationItems()
         checkIfUserIsLoggedIn()
-
+  
+    }
+    
+    //MARK: VIEWDIDAPPEAR
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(true)
         
     }
+    
+    //MARK: USER LOGGED IN CHECK
     func checkIfUserIsLoggedIn() {
         if Auth.auth().currentUser?.uid == nil {
             perform(#selector(handleLogout), with: nil, afterDelay: 0)
@@ -27,9 +40,8 @@ class ConversationsController: UITableViewController {
             let uid = Auth.auth().currentUser?.uid
             let ref = Database.database().reference().child(FDNodeName.userNode()).child(uid!)
             ref.observeSingleEvent(of: .value, with: { (snapshot) in
-                print(snapshot)
                 if let dictionary = snapshot.value as? [String: AnyObject] {
-                    self.navigationItem.title = dictionary["name"] as? String
+                    self.navigationTitile = dictionary["name"] as? String
                 }
             })
             

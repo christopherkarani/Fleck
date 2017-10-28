@@ -123,8 +123,6 @@ extension LoginViewController {
                 return
             }
             
-            print("Success Authenticating user to server")
-            
             self.dismiss(animated: true, completion: nil)
         })
     }
