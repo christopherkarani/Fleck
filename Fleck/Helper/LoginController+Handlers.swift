@@ -95,17 +95,12 @@ extension LoginViewController {
                 print("Something Went wrong while trying to turn image to jpeg")
                 return
             }
-            
-            
-            guard let imageData = UIImagePNGRepresentation(self.profileImageSelector.image!) else {
-                print("Image to PNG Error")
-                return
-            }
+
             // generate a unique string
             let imageName = UUID().uuidString
             //Store ImageInto Firebase DB
             let storageRef = Storage.storage().reference().child("Profile_Images").child("\(imageName).jpg")
-            storageRef.putData(imageData, metadata: nil, completion: { (metadata, error) in
+            storageRef.putData(uploadData, metadata: nil, completion: { (metadata, error) in
                 if error != nil {
                     print(error!)
                 }
