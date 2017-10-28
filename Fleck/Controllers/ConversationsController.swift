@@ -9,7 +9,12 @@
 import UIKit
 import Firebase
 
-class ConversationsController: UITableViewController {
+protocol ConversationsControllerDelegate {
+    func fetchUserSetupNavigationBar()
+    var navigationTitile: String? { get set }
+}
+
+class ConversationsController: UITableViewController, ConversationsControllerDelegate {
     
     var navigationTitile: String? {
         didSet {
@@ -44,9 +49,19 @@ class ConversationsController: UITableViewController {
                     self.navigationTitile = dictionary["name"] as? String
                 }
             })
-            
         }
     }
+    func fetchUserSetupNavigationBar() {
+        let uid = Auth.auth().currentUser?.uid
+        let ref = Database.database().reference().child(FDNodeName.userNode()).child(uid!)
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if let dictionary = snapshot.value as? [String: AnyObject] {
+                self.navigationTitile = dictionary["name"] as? String
+            }
+        })
+        
+    }
+    
     func setupNavigationItems() {
         let logoutButton = UIBarButtonItem(title: "Logout", style: .plain, target: self, action: #selector(handleLogout))
         let composeButton = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(handleNewMessage))
@@ -69,6 +84,7 @@ class ConversationsController: UITableViewController {
         }
         
         let loginController = LoginViewController()
+        loginController.delegate = self
         present(loginController, animated: true) {
             // Delete Keys from key chain.
             // End Session

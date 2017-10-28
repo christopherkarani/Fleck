@@ -58,17 +58,7 @@ extension NewMessageController {
         cell.textLabel?.text = myUser.name
         cell.detailTextLabel?.text = myUser.email
         if let profileImageURL = myUser.profileImageURL {
-            let url = URL(string: profileImageURL)
-            
-            URLSession.shared.dataTask(with: url!, completionHandler: { (data, response, error) in
-                if error != nil {
-                    print(error!)
-                }
-                
-                DispatchQueue.main.async {
-                    cell.profileImageView.image = UIImage(data: data!)
-                }
-            }).resume()
+            cell.profileImageView.loadImageUsingCache(withURLString: profileImageURL)
         }
         return cell
     }
@@ -81,6 +71,6 @@ extension NewMessageController {
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 60
+        return 70
     }
 }

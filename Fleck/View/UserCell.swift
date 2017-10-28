@@ -14,7 +14,8 @@ class UserCell: UITableViewCell {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.layer.masksToBounds = true
-        imageView.layer.cornerRadius = 20
+        imageView.layer.cornerRadius = 24
+        imageView.contentMode = .scaleAspectFill
         return imageView
     }()
     
@@ -22,8 +23,8 @@ class UserCell: UITableViewCell {
         // x,y, width and height
         profileImageView.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 8).isActive = true
         profileImageView.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
-        profileImageView.widthAnchor.constraint(equalToConstant: 40).isActive = true
-        profileImageView.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        profileImageView.widthAnchor.constraint(equalToConstant: 48).isActive = true
+        profileImageView.heightAnchor.constraint(equalToConstant: 48).isActive = true
     }
     private func addViewsToCell() {
         addSubview(profileImageView)
@@ -36,10 +37,10 @@ class UserCell: UITableViewCell {
         textLabel?.frame = CGRect(x: 60,
                                   y: textLabel!.frame.origin.y,
                                   width: textLabel!.frame.width,
-                                  height: textLabel!.frame.height)
+                                  height: textLabel!.frame.height - 2)
         detailTextLabel?.frame =  CGRect(x: 60,
                                          y: detailTextLabel!.frame.origin.y,
-                                         width: detailTextLabel!.frame.width - 2,
+                                         width: detailTextLabel!.frame.width,
                                          height: detailTextLabel!.frame.height + 2)
     }
     
