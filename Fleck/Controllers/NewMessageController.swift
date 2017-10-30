@@ -12,6 +12,7 @@ import Firebase
 class NewMessageController: UITableViewController {
     var users = [LocalUser]()
     var cellID = "CellID"
+    var conversationsDelegate: ConversationsControllerDelegate?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,6 +28,7 @@ class NewMessageController: UITableViewController {
         ref.observe(.childAdded) { (snapshot) in
             if let dictionary = snapshot.value as? [String: AnyObject] {
                 var user = LocalUser()
+                user.id = snapshot.key
                 user.name = dictionary["name"] as? String
                 user.email = dictionary["email"] as? String
                 user.profileImageURL = dictionary["profileImageUrl"] as? String
@@ -61,6 +63,13 @@ extension NewMessageController {
             cell.profileImageView.loadImageUsingCache(withURLString: profileImageURL)
         }
         return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        dismiss(animated: true) {
+            let user = self.users[indexPath.row]
+            self.conversationsDelegate?.showChatController(forUser: user)
+        }
     }
 }
 

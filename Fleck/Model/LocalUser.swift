@@ -9,6 +9,7 @@
 import Foundation
 
 struct LocalUser {
+    var id: String?
     var name: String?
     var email: String?
     var profileImageURL: String?

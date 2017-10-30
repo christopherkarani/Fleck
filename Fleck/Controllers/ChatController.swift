@@ -10,6 +10,13 @@ import UIKit
 import Firebase
 
 class ChatController: UICollectionViewController {
+    
+    var user : LocalUser? {
+        didSet {
+            navigationItem.title = user?.name
+        }
+    }
+    
     lazy var inputTextField : UITextField = {
         let textField = UITextField()
         textField.placeholder = "send message"
@@ -21,7 +28,6 @@ class ChatController: UICollectionViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        navigationItem.title = "Messages"
         collectionView?.backgroundColor = .white
         setupInputComponents()
     }
@@ -76,7 +82,13 @@ class ChatController: UICollectionViewController {
     @objc func handleSend() {
         let ref = Database.database().reference().child("messages")
         let childRef = ref.childByAutoId()
-        let values = ["text": inputTextField.text!]
+        let toID = user!.id!
+        let fromID = Auth.auth().currentUser!.uid
+        let timestamp = Int(Date().timeIntervalSince1970)
+        let values: [String : Any] = ["toID": toID,
+                      "fromID": fromID,
+                      "text": inputTextField.text!,
+                      "timestamp": timestamp] 
         childRef.updateChildValues(values)
     }
 

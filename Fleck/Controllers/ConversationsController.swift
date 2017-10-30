@@ -9,26 +9,52 @@
 import UIKit
 import Firebase
 
-protocol ConversationsControllerDelegate {
+protocol ConversationsControllerDelegate: class {
     func setupNavigationBar(withUser user: LocalUser)
     func fetchUserSetupNavigationBar()
+    func showChatController(forUser user: LocalUser)
 }
 
 class ConversationsController: UITableViewController, ConversationsControllerDelegate {
     
-    var navigationTitile: String? {
-        didSet {
-            navigationItem.title = navigationTitile!
-        }
-    }
+    var messages = [Message]()
+    var messagesDictionary = [String: Message]()
+    var cellID = "CellID"
     //MARK: VIEWDIDLOAD
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-       
+        tableView.register(UserCell.self, forCellReuseIdentifier: cellID)
         setupNavigationItems()
         checkIfUserIsLoggedIn()
+        observeMessages()
   
+    }
+   
+    func observeMessages() {
+        let ref = Database.database().reference().child("messages")
+        ref.observe(.childAdded) { (snapshot) in
+            if let dictionary = snapshot.value as? [String: AnyObject] {
+                var message = Message()
+                message.fromID = dictionary["fromID"] as? String
+                message.text = dictionary["text"] as? String
+                message.timeStamp = dictionary["timestamp"] as? Int
+                message.toID = dictionary["toID"] as? String
+                //self.messages.append(message)
+                if let toID = message.toID {
+                   self.messagesDictionary[toID] = message
+                    self.messages = Array(self.messagesDictionary.values)
+                    self.messages.sort(by: { (message1, message2) -> Bool in
+                        return message1.timeStamp! > message2.timeStamp!
+                    })
+                }
+                
+                
+                DispatchQueue.main.async {
+                    self.tableView.reloadData()
+                }
+            }
+        }
     }
     
     //MARK: VIEWDIDAPPEAR
@@ -109,23 +135,15 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
         containerView.centerYAnchor.constraint(equalTo: titleView.centerYAnchor).isActive = true
         containerView.centerXAnchor.constraint(equalTo: titleView.centerXAnchor).isActive = true
         
-        let button = UIButton(type: .system)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(showChatController), for: .touchUpInside)
-        titleView.addSubview(button)
-        
-        button.centerXAnchor.constraint(equalTo: titleView.centerXAnchor).isActive = true
-        button.centerYAnchor.constraint(equalTo: titleView.centerYAnchor).isActive = true
-        button.widthAnchor.constraint(equalTo: titleView.widthAnchor).isActive = true
-        button.heightAnchor.constraint(equalTo: titleView.heightAnchor).isActive = true
         
         self.navigationItem.titleView = titleView
   
     }
     
-    @objc func showChatController() {
+     func showChatController(forUser user: LocalUser) {
         let layout = UICollectionViewFlowLayout()
         let chatController = ChatController(collectionViewLayout: layout)
+        chatController.user = user
         navigationController?.pushViewController(chatController, animated: true)
     }
     
@@ -138,6 +156,7 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
     
     @objc func handleNewMessage() {
         let newMessageController = NewMessageController()
+        newMessageController.conversationsDelegate = self
         let navController = UINavigationController(rootViewController: newMessageController)
         present(navController, animated: true, completion: nil)
     }
@@ -162,5 +181,24 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         
+    }
+}
+
+// DataSource
+extension ConversationsController {
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let message = messages[indexPath.row]
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellID) as! UserCell
+        cell.message = message
+        return cell
+    }
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return messages.count
+    }
+}
+// Delegate Methods
+extension ConversationsController {
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 76
     }
 }
