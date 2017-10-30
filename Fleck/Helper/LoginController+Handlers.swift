@@ -67,7 +67,6 @@ extension LoginViewController {
             }
             self.delegate?.fetchUserSetupNavigationBar()
             self.dismiss(animated: true, completion: nil)
-            
         }
     }
     
@@ -160,10 +159,7 @@ extension LoginViewController {
         passwordTextFieldHeightAnchor = passwordTextField.heightAnchor.constraint(equalTo: inputContainerView.heightAnchor, multiplier: selectedIndex == 0 ? 1/2 : 1/3)
         passwordTextFieldHeightAnchor?.isActive = true
     }
-    
-    
-    
-    
+
     //MARK: ADDINGSUBVIEWS
     ///Handles the adding of subviews to the login Controller
     func handleAdditionOfSubviews() {
