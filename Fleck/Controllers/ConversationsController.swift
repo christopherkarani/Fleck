@@ -10,8 +10,8 @@ import UIKit
 import Firebase
 
 protocol ConversationsControllerDelegate {
+    func setupNavigationBar(withUser user: LocalUser)
     func fetchUserSetupNavigationBar()
-    var navigationTitile: String? { get set }
 }
 
 class ConversationsController: UITableViewController, ConversationsControllerDelegate {
@@ -42,13 +42,7 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
         if Auth.auth().currentUser?.uid == nil {
             perform(#selector(handleLogout), with: nil, afterDelay: 0)
         } else {
-            let uid = Auth.auth().currentUser?.uid
-            let ref = Database.database().reference().child(FDNodeName.userNode()).child(uid!)
-            ref.observeSingleEvent(of: .value, with: { (snapshot) in
-                if let dictionary = snapshot.value as? [String: AnyObject] {
-                    self.navigationTitile = dictionary["name"] as? String
-                }
-            })
+            fetchUserSetupNavigationBar()
         }
     }
     func fetchUserSetupNavigationBar() {
@@ -56,9 +50,64 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
         let ref = Database.database().reference().child(FDNodeName.userNode()).child(uid!)
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
             if let dictionary = snapshot.value as? [String: AnyObject] {
-                self.navigationTitile = dictionary["name"] as? String
+//                self.navigationTitile = dictionary["name"] as? String
+                var user = LocalUser()
+                user.name = dictionary["name"] as? String
+                user.email = dictionary["email"] as? String
+                user.profileImageURL = dictionary["profileImageUrl"] as? String
+                self.setupNavigationBar(withUser: user)
             }
         })
+        
+    }
+    
+    func setupNavigationBar(withUser user: LocalUser) {
+        guard let profileImageURLString = user.profileImageURL else {
+            print("Something went wrong while setting up Navigation Bar")
+            return
+        }
+        let titleView = UIView()
+        titleView.frame = CGRect(x: 0, y: 0, width: 100, height: 40)
+        titleView.translatesAutoresizingMaskIntoConstraints = false
+        titleView.backgroundColor = .red
+        let profileImageView = UIImageView()
+        profileImageView.layer.cornerRadius = 20
+        profileImageView.clipsToBounds = true
+        profileImageView.translatesAutoresizingMaskIntoConstraints = false
+        profileImageView.contentMode = .scaleAspectFill
+        profileImageView.loadImageUsingCache(withURLString: profileImageURLString)
+        
+        let containerView = UIView()
+        containerView.translatesAutoresizingMaskIntoConstraints = false
+        titleView.addSubview(containerView)
+        
+
+        
+        let nameLabel = UILabel()
+        nameLabel.text = user.name
+        nameLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        containerView.addSubview(profileImageView)
+        containerView.addSubview(nameLabel)
+
+        
+        // nameLabel Constrainsts
+        nameLabel.leftAnchor.constraint(equalTo: profileImageView.rightAnchor, constant: 8).isActive = true
+        nameLabel.centerYAnchor.constraint(equalTo: profileImageView.centerYAnchor).isActive = true
+        nameLabel.rightAnchor.constraint(equalTo: containerView.rightAnchor).isActive = true
+        nameLabel.heightAnchor.constraint(equalTo: profileImageView.heightAnchor).isActive = true
+
+        //x,y,width,height
+        profileImageView.leftAnchor.constraint(equalTo: containerView.leftAnchor).isActive = true
+        profileImageView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor).isActive = true
+        profileImageView.widthAnchor.constraint(equalToConstant: 40).isActive = true
+        profileImageView.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        
+        // containerView Constraints
+        containerView.centerYAnchor.constraint(equalTo: titleView.centerYAnchor).isActive = true
+        containerView.centerXAnchor.constraint(equalTo: titleView.centerXAnchor).isActive = true
+        
+        self.navigationItem.titleView = titleView
         
     }
     

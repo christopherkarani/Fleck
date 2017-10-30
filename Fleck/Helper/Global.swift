@@ -26,4 +26,15 @@ enum FDNodeName: String {
     static func userNode() -> String {
         return "users"
     }
+    static func nameNode() -> String {
+        return "name"
+    }
+    
+    static func emailNode() -> String {
+        return "email"
+    }
+    
+    static func profileImageURLNode() -> String {
+        return "profileImageUrl"
+    }
 }

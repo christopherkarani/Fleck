@@ -10,6 +10,8 @@ import UIKit
 import Firebase
 
 extension LoginViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    
+    //MARK: Handle ImagePicker
     @objc func handleProfileImagePicker() {
         let picker = UIImagePickerController()
         picker.allowsEditing = true
@@ -17,6 +19,7 @@ extension LoginViewController: UIImagePickerControllerDelegate, UINavigationCont
         present(picker, animated: true, completion: nil)
     }
     
+
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         
         var selectedImage : UIImage?
@@ -39,7 +42,7 @@ extension LoginViewController: UIImagePickerControllerDelegate, UINavigationCont
 }
 
 extension LoginViewController {
-    //MARK: LOGIN FUNCTIONALITY
+    //MARK: handle Login/Register Condition
     @objc func handleLoginRegister() {
         if loginRegisterSegementedControl.selectedSegmentIndex == 0 {
             handleLogin()
@@ -48,6 +51,7 @@ extension LoginViewController {
         }
     }
     
+    // MARK: Handle Login
     func handleLogin() {
         guard let email = emailTextField.text else {
             print("Invaid Email")
@@ -67,6 +71,7 @@ extension LoginViewController {
         }
     }
     
+    //MARK: HandleRegister
     func handleRegister() {
         guard let email = emailTextField.text else {
             print("Invaid Email")
@@ -91,7 +96,8 @@ extension LoginViewController {
                 fatalError("No user ID provided during auth")
             }
             
-            guard let uploadData = UIImageJPEGRepresentation(self.profileImageSelector.image!, 0.1) else {
+            guard  let profileImage = self.profileImageSelector.image,
+                let uploadData = UIImageJPEGRepresentation(profileImage, 0.1) else {
                 print("Something Went wrong while trying to turn image to jpeg")
                 return
             }
@@ -110,10 +116,10 @@ extension LoginViewController {
                 }
                 let values = ["name": name, "email": email, "profileImageUrl": profileImageURL]
                 self.registerUserIntoDatabase(withUID: uid, andValues: values)
-
             })
         }
     }
+    
      /// Register Users to database
     func registerUserIntoDatabase(withUID id: String, andValues values: [String:String]) {
         let ref = Database.database().reference()
@@ -123,7 +129,11 @@ extension LoginViewController {
                 print(error!)
                 return
             }
-            self.delegate?.navigationTitile = values["name"]
+            var user = LocalUser()
+            user.name = values["name"]
+            user.email = values["email"]
+            user.profileImageURL = values["profileImageURL"]
+            self.delegate?.setupNavigationBar(withUser: user)
             self.dismiss(animated: true, completion: nil)
         })
     }
