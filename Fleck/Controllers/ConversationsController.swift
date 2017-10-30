@@ -69,7 +69,8 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
         let titleView = UIView()
         titleView.frame = CGRect(x: 0, y: 0, width: 100, height: 40)
         titleView.translatesAutoresizingMaskIntoConstraints = false
-        titleView.backgroundColor = .red
+
+   
         let profileImageView = UIImageView()
         profileImageView.layer.cornerRadius = 20
         profileImageView.clipsToBounds = true
@@ -86,6 +87,7 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
         let nameLabel = UILabel()
         nameLabel.text = user.name
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
+
         
         containerView.addSubview(profileImageView)
         containerView.addSubview(nameLabel)
@@ -107,8 +109,24 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
         containerView.centerYAnchor.constraint(equalTo: titleView.centerYAnchor).isActive = true
         containerView.centerXAnchor.constraint(equalTo: titleView.centerXAnchor).isActive = true
         
-        self.navigationItem.titleView = titleView
+        let button = UIButton(type: .system)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(showChatController), for: .touchUpInside)
+        titleView.addSubview(button)
         
+        button.centerXAnchor.constraint(equalTo: titleView.centerXAnchor).isActive = true
+        button.centerYAnchor.constraint(equalTo: titleView.centerYAnchor).isActive = true
+        button.widthAnchor.constraint(equalTo: titleView.widthAnchor).isActive = true
+        button.heightAnchor.constraint(equalTo: titleView.heightAnchor).isActive = true
+        
+        self.navigationItem.titleView = titleView
+  
+    }
+    
+    @objc func showChatController() {
+        let layout = UICollectionViewFlowLayout()
+        let chatController = ChatController(collectionViewLayout: layout)
+        navigationController?.pushViewController(chatController, animated: true)
     }
     
     func setupNavigationItems() {
