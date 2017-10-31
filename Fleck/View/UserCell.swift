@@ -13,19 +13,8 @@ class UserCell: UITableViewCell {
     
     var message : Message? {
         didSet {
-            if let toID = message?.toID {
-                let ref = Database.database().reference().child("users").child(toID)
-                ref.observeSingleEvent(of: .value, with: { (snapshot) in
-                    if let dictionary = snapshot.value as? [String: AnyObject] {
-                        self.textLabel?.text = dictionary["name"] as? String
-                        
-                        if let profileImageUrl = dictionary["profileImageUrl"] as? String {
-                            self.profileImageView.loadImageUsingCache(withURLString: profileImageUrl)
-                        }
-                    }
-                }, withCancel: nil)
-            }
 
+            setupNameAndProfileImage()
             
             detailTextLabel?.text = message?.text!
             if let seconds = message?.timeStamp {
@@ -36,9 +25,31 @@ class UserCell: UITableViewCell {
         }
     }
     
+    func setupNameAndProfileImage() {
+        var chatPartnerID : String?
+        
+        if message?.fromID == Auth.auth().currentUser?.uid {
+            chatPartnerID = message?.toID
+        } else {
+            chatPartnerID = message?.fromID
+        }
+        
+        if let id = chatPartnerID {
+            let ref = Database.database().reference().child("users").child(id)
+            ref.observeSingleEvent(of: .value, with: { (snapshot) in
+                if let dictionary = snapshot.value as? [String: AnyObject] {
+                    self.textLabel?.text = dictionary["name"] as? String
+                    
+                    if let profileImageUrl = dictionary["profileImageUrl"] as? String {
+                        self.profileImageView.loadImageUsingCache(withURLString: profileImageUrl)
+                    }
+                }
+            }, withCancel: nil)
+        }
+    }
+    
     let timeLabel: UILabel = {
        let timeLabel = UILabel()
-        timeLabel.text = "HH:MM:SS"
         timeLabel.font = UIFont.systemFont(ofSize: 11)
         timeLabel.textColor = UIColor.lightGray
         timeLabel.translatesAutoresizingMaskIntoConstraints = false

@@ -41,4 +41,8 @@ enum FDNodeName: String {
     static func profileImageURLNode() -> String {
         return "profileImageUrl"
     }
+    
+    static func userMessagesNode() -> String {
+        return "user-messages"
+    }
 }

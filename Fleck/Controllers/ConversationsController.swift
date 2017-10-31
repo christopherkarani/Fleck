@@ -27,33 +27,48 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
         tableView.register(UserCell.self, forCellReuseIdentifier: cellID)
         setupNavigationItems()
         checkIfUserIsLoggedIn()
-        observeMessages()
+        //observeMessages()
+        observeUserMessages()
   
+    }
+    
+    func observeUserMessages() {
+        guard let uid = Auth.auth().currentUser?.uid else {
+            return
+        }
+        let ref = Database.database().reference().child("user-messages").child(uid)
+        ref.observe(.childAdded) { (snapshot) in
+            let messageID = snapshot.key
+            let messagesReferance = Database.database().reference().child("messages").child(messageID)
+            messagesReferance.observeSingleEvent(of: .value, with: { (snapshot) in
+                if let dictionary = snapshot.value as? [String: AnyObject] {
+                    var message = Message()
+                    message.fromID = dictionary["fromID"] as? String
+                    message.text = dictionary["text"] as? String
+                    message.timeStamp = dictionary["timestamp"] as? Int
+                    message.toID = dictionary["toID"] as? String
+                    //self.messages.append(message)
+                    if let toID = message.toID {
+                        self.messagesDictionary[toID] = message
+                        self.messages = Array(self.messagesDictionary.values)
+                        self.messages.sort(by: { (message1, message2) -> Bool in
+                            return message1.timeStamp! > message2.timeStamp!
+                        })
+                    }
+                    
+                    
+                    DispatchQueue.main.async {
+                        self.tableView.reloadData()
+                    }
+                }
+            })
+        }
     }
    
     func observeMessages() {
         let ref = Database.database().reference().child("messages")
         ref.observe(.childAdded) { (snapshot) in
-            if let dictionary = snapshot.value as? [String: AnyObject] {
-                var message = Message()
-                message.fromID = dictionary["fromID"] as? String
-                message.text = dictionary["text"] as? String
-                message.timeStamp = dictionary["timestamp"] as? Int
-                message.toID = dictionary["toID"] as? String
-                //self.messages.append(message)
-                if let toID = message.toID {
-                   self.messagesDictionary[toID] = message
-                    self.messages = Array(self.messagesDictionary.values)
-                    self.messages.sort(by: { (message1, message2) -> Bool in
-                        return message1.timeStamp! > message2.timeStamp!
-                    })
-                }
-                
-                
-                DispatchQueue.main.async {
-                    self.tableView.reloadData()
-                }
-            }
+
         }
     }
     
@@ -72,8 +87,10 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
         }
     }
     func fetchUserSetupNavigationBar() {
-        let uid = Auth.auth().currentUser?.uid
-        let ref = Database.database().reference().child(FDNodeName.userNode()).child(uid!)
+        guard let uid = Auth.auth().currentUser?.uid else {
+            return
+        }
+        let ref = Database.database().reference().child(FDNodeName.userNode()).child(uid)
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
             if let dictionary = snapshot.value as? [String: AnyObject] {
 //                self.navigationTitile = dictionary["name"] as? String
@@ -88,6 +105,12 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
     }
     
     func setupNavigationBar(withUser user: LocalUser) {
+        messages.removeAll()
+        messagesDictionary.removeAll()
+        tableView.reloadData()
+        observeUserMessages()
+        
+        
         guard let profileImageURLString = user.profileImageURL else {
             print("Something went wrong while setting up Navigation Bar")
             return

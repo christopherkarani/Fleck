@@ -89,7 +89,20 @@ class ChatController: UICollectionViewController {
                       "fromID": fromID,
                       "text": inputTextField.text!,
                       "timestamp": timestamp] 
-        childRef.updateChildValues(values)
+        childRef.updateChildValues(values) { (error, ref) in
+            if error != nil {
+                print(error!)
+                return
+            }
+            
+            let userMessageRef = Database.database().reference().child("user-messages").child(fromID)
+            let messageID = childRef.key
+            userMessageRef.updateChildValues([messageID: 1])
+            
+            let recipientUserMessageRef = Database.database().reference().child("user-messages").child(toID)
+            recipientUserMessageRef.updateChildValues([messageID: 1])
+            
+        }
     }
 
 }

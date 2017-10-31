@@ -64,6 +64,7 @@ extension LoginViewController {
         Auth.auth().signIn(withEmail: email, password: password) { (user, error) in
             if error != nil {
                 print(error!)
+                return
             }
             self.delegate?.fetchUserSetupNavigationBar()
             self.dismiss(animated: true, completion: nil)
