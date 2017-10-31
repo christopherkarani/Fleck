@@ -25,6 +25,8 @@ class UserCell: UITableViewCell {
         }
     }
     
+    
+    
     func setupNameAndProfileImage() {
         var chatPartnerID : String?
         
