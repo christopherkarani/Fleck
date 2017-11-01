@@ -15,6 +15,12 @@ extension UIColor {
     }
 }
 
+struct Theme {
+    static let chatBubbleOutgoing : UIColor = UIColor(r: 0, g: 136, b: 249)
+    static let chatBubbleIncoming : UIColor = UIColor(r: 240, g: 240, b: 240)
+    static let loginBackgroundColor : UIColor = UIColor(r: 61, g: 91, b: 151)
+}
+
 
 //Contains Firbase DB Node Names
 enum FDNodeRef: String {
@@ -29,10 +35,6 @@ enum FDNodeRef: String {
         let ref = Database.database().reference().child("users")
         return ref
     }
-//    static func userNode() -> DatabaseReference {
-//        let ref = Database.database().reference().child("users")
-//        return ref
-//    }
     
     /// returns the 'DatabaseReference' of "users" Node Reference inside of your Firebase Database
     static func nameNode() -> String? {

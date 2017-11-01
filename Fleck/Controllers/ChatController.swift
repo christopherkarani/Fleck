@@ -119,6 +119,9 @@ class ChatController: UICollectionViewController {
     
     
     //MARK: SEND FUNCTION
+    ///Handles Sending to the Firebase database. Messages are stored inside the "messages" node
+    ///Messages recieve a unique ID via 'childByAutoId()'
+    ///
     @objc func handleSend() {
         let ref = Database.database().reference().child("messages")
         let childRef = ref.childByAutoId()
@@ -166,9 +169,34 @@ extension ChatController {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath) as! ChatMessageCell
         let message = messages[indexPath.item]
         cell.textView.text = message.text
+        
+        setupCell(withCell: cell, andMessage: message)
+        
         let padding: CGFloat = 32
         cell.bubbleWidthAnchor?.constant = estimatedFrame(forText: message.text!).width + padding
         return cell
+    }
+    
+    func setupCell(withCell cell: ChatMessageCell, andMessage message: Message) {
+        if let profileImageURL = self.user?.profileImageURL {
+            cell.profileImageView.loadImageUsingCache(withURLString: profileImageURL)
+        }
+        if message.fromID == Auth.auth().currentUser?.uid {
+            cell.bubbleView.backgroundColor = Theme.chatBubbleOutgoing
+            cell.textView.textColor = .white
+            cell.bubbleViewXAnchor?.isActive = false
+            cell.bubbleViewXAnchor = cell.bubbleView.rightAnchor.constraint(equalTo: cell.rightAnchor, constant: -8)
+            cell.bubbleViewXAnchor?.isActive = true
+            cell.profileImageView.isHidden = true
+            
+        } else {
+            cell.bubbleViewXAnchor?.isActive = false
+            cell.bubbleViewXAnchor = cell.bubbleView.leftAnchor.constraint(equalTo: cell.profileImageView.rightAnchor, constant: 8)
+            cell.bubbleViewXAnchor?.isActive = true
+            cell.bubbleView.backgroundColor = Theme.chatBubbleIncoming
+            cell.textView.textColor = .black
+            cell.profileImageView.isHidden = false
+        }
     }
 }
 

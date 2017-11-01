@@ -27,7 +27,6 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
         tableView.register(UserCell.self, forCellReuseIdentifier: cellID)
         setupNavigationItems()
         checkIfUserIsLoggedIn()
-        //observeMessages()
         observeUserMessages()
   
     }
@@ -55,22 +54,20 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
                             return message1.timeStamp! > message2.timeStamp!
                         })
                     }
-                    
-                    
-                    DispatchQueue.main.async {
-                        self.tableView.reloadData()
-                    }
+                    self.timer?.invalidate()
+                    self.timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.handleReload), userInfo: nil, repeats: false)
+
                 }
             })
         }
     }
-   
-    func observeMessages() {
-        let ref = Database.database().reference().child("messages")
-        ref.observe(.childAdded) { (snapshot) in
-
+    var timer : Timer?
+    @objc func handleReload() {
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
         }
     }
+
     
     //MARK: VIEWDIDAPPEAR
     override func viewDidAppear(_ animated: Bool) {

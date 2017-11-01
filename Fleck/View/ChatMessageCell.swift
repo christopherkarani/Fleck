@@ -17,6 +17,14 @@ class ChatMessageCell: UICollectionViewCell {
         tv.textColor = .white
         return tv
     }()
+    let profileImageView : UIImageView = {
+        let imageView = UIImageView()
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.layer.masksToBounds = true
+        imageView.layer.cornerRadius = 16
+        imageView.contentMode = .scaleAspectFill
+        return imageView
+    }()
     
     var bubbleView: UIView = {
         let view = UIView()
@@ -27,25 +35,35 @@ class ChatMessageCell: UICollectionViewCell {
         return view
     }()
     var bubbleWidthAnchor: NSLayoutConstraint?
+    var bubbleViewXAnchor: NSLayoutConstraint?
     
     func setupConstraints() {
-        //textView.rightAnchor.constraint(equalTo: self.rightAnchor).isActive = true
+        //TextView Constraints
         textView.leftAnchor.constraint(equalTo: bubbleView.leftAnchor, constant: 8).isActive = true
         textView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
         textView.rightAnchor.constraint(equalTo: bubbleView.rightAnchor).isActive = true
         textView.heightAnchor.constraint(equalTo: self.heightAnchor).isActive = true
         
-        bubbleView.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -8).isActive = true
+        //BubbleView Constraints
+        bubbleViewXAnchor = bubbleView.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -8)
+        bubbleViewXAnchor?.isActive = true
         bubbleView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
         bubbleWidthAnchor = bubbleView.widthAnchor.constraint(equalToConstant: 200)
         bubbleWidthAnchor?.isActive = true
         bubbleView.heightAnchor.constraint(equalTo: self.heightAnchor).isActive = true
+        
+        //ProfileImageview Constraints
+        profileImageView.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 8).isActive = true
+        profileImageView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
+        profileImageView.widthAnchor.constraint(equalToConstant: 32).isActive = true
+        profileImageView.heightAnchor.constraint(equalToConstant: 32).isActive = true
     }
     
     func loadSubviews() {
 
         addSubview(bubbleView)
         addSubview(textView)
+        addSubview(profileImageView)
     }
     
     override init(frame: CGRect) {

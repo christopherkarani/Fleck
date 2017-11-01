@@ -110,7 +110,7 @@ class LoginViewController : UIViewController {
     //MARK: VIEWDIDLOAD
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor.init(r: 61, g: 91, b: 151)
+        view.backgroundColor = Theme.loginBackgroundColor
         handleAdditionOfSubviews()
         handleConstraints()
     }
