@@ -122,8 +122,7 @@ extension LoginViewController {
     
      /// Register Users to database
     func registerUserIntoDatabase(withUID id: String, andValues values: [String:String]) {
-        let ref = Database.database().reference()
-        let usersRef = ref.child(FDNodeName.userNode()).child(id)
+        let usersRef = FDNodeRef.userNode().child(id)
         usersRef.updateChildValues(values, withCompletionBlock: { (error, ref) in
             if error != nil {
                 print(error!)

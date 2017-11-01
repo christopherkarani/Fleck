@@ -14,8 +14,13 @@ class ChatController: UICollectionViewController {
     var user : LocalUser? {
         didSet {
             navigationItem.title = user?.name
+            observerMessages()
         }
     }
+    var messages = [Message]()
+    
+
+    let cellID = "cellID"
     
     lazy var inputTextField : UITextField = {
         let textField = UITextField()
@@ -25,18 +30,22 @@ class ChatController: UICollectionViewController {
         return textField
     }()
 
+    //MARK: Viewdidload
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        collectionView?.contentInset = UIEdgeInsets(top: 8, left: 0, bottom: 50, right: 0)
+        collectionView?.scrollIndicatorInsets = UIEdgeInsets(top: 0, left: 0, bottom: 58, right: 0)
         collectionView?.backgroundColor = .white
+        collectionView?.register(ChatMessageCell.self, forCellWithReuseIdentifier: cellID)
+        collectionView?.alwaysBounceVertical = true
         setupInputComponents()
     }
     
+    //MARK: Setup Input Components
     func setupInputComponents() {
         let containerView = UIView()
         containerView.translatesAutoresizingMaskIntoConstraints = false
-
-        
+        containerView.backgroundColor = .white
         view.addSubview(containerView)
         
         //x,y,width,height
@@ -51,14 +60,12 @@ class ChatController: UICollectionViewController {
         sendButton.addTarget(self, action: #selector(handleSend), for: .touchUpInside)
         containerView.addSubview(sendButton)
         
-        
         //x,y,w,h
         sendButton.rightAnchor.constraint(equalTo: containerView.rightAnchor).isActive = true
         sendButton.centerYAnchor.constraint(equalTo: containerView.centerYAnchor).isActive = true
         sendButton.widthAnchor.constraint(equalToConstant: 70).isActive = true
         sendButton.heightAnchor.constraint(equalTo: containerView.heightAnchor).isActive = true
         
-
         containerView.addSubview(inputTextField)
         
         //x,y,w,h
@@ -79,6 +86,39 @@ class ChatController: UICollectionViewController {
   
     }
     
+    func observerMessages() {
+        guard let uid = Auth.auth().currentUser?.uid else {
+            return
+        }
+        let userMessageRef = Database.database().reference().child("user-messages").child(uid)
+        userMessageRef.observe(.childAdded) { (snapshot) in
+            let messageID = snapshot.key
+            let messageRef = Database.database().reference().child("messages").child(messageID)
+            messageRef.observeSingleEvent(of: .value, with: { (snapshot) in
+                guard let dictionary = snapshot.value as? [String: AnyObject] else {
+                    return
+                }
+       
+                var message = Message()
+                message.fromID = dictionary["fromID"] as? String
+                message.toID = dictionary["toID"] as? String
+                message.text = dictionary["text"] as? String
+                message.timeStamp = dictionary["timestamp"] as? Int
+                
+                if message.chatPartnerID() == self.user?.id {
+                    self.messages.append(message)
+                    
+                    DispatchQueue.main.async {
+                        self.collectionView?.reloadData()
+                    }
+                }
+
+            })
+        }
+    }
+    
+    
+    //MARK: SEND FUNCTION
     @objc func handleSend() {
         let ref = Database.database().reference().child("messages")
         let childRef = ref.childByAutoId()
@@ -94,6 +134,7 @@ class ChatController: UICollectionViewController {
                 print(error!)
                 return
             }
+            self.inputTextField.text = nil
             
             let userMessageRef = Database.database().reference().child("user-messages").child(fromID)
             let messageID = childRef.key
@@ -101,7 +142,6 @@ class ChatController: UICollectionViewController {
             
             let recipientUserMessageRef = Database.database().reference().child("user-messages").child(toID)
             recipientUserMessageRef.updateChildValues([messageID: 1])
-            
         }
     }
 
@@ -111,5 +151,49 @@ extension ChatController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         handleSend()
         return true
+    }
+    
+    func textFieldShouldClear(_ textField: UITextField) -> Bool {
+        return true
+    }
+}
+// DataSource
+extension ChatController {
+    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return messages.count
+    }
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath) as! ChatMessageCell
+        let message = messages[indexPath.item]
+        cell.textView.text = message.text
+        let padding: CGFloat = 32
+        cell.bubbleWidthAnchor?.constant = estimatedFrame(forText: message.text!).width + padding
+        return cell
+    }
+}
+
+//Delegate
+extension ChatController: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        var height : CGFloat?
+        let padding: CGFloat = 20
+        if let text = messages[indexPath.item].text {
+            height = estimatedFrame(forText: text).height + padding
+            
+        }
+       return CGSize(width: view.frame.width, height: height!)
+    }
+    
+    func estimatedFrame(forText text: String) -> CGRect {
+        // width is same as cell.texView width
+        //height is an arbitrary larg value
+        let size = CGSize(width: 200, height: 1000)
+        let options = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
+        let attributes = [NSAttributedStringKey.font: UIFont.systemFont(ofSize: 16)]
+        return  NSString(string: text).boundingRect(with: size, options: options, attributes: attributes, context: nil)
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        collectionView?.collectionViewLayout.invalidateLayout() // good fix when using constraints
     }
 }

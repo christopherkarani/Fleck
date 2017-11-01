@@ -17,16 +17,26 @@ extension UIColor {
 
 
 //Contains Firbase DB Node Names
-enum FDNodeName: String {
+enum FDNodeRef: String {
     case users
     
     func returnRootNode() -> DatabaseReference {
         return Database.database().reference()
     }
-    static func userNode() -> String {
-        return "users"
+    
+    /// returns the 'DatabaseReference' of "users" Node Reference inside of your Firebase Database
+    static func userNode() -> DatabaseReference {
+        let ref = Database.database().reference().child("users")
+        return ref
     }
-    static func nameNode() -> String {
+//    static func userNode() -> DatabaseReference {
+//        let ref = Database.database().reference().child("users")
+//        return ref
+//    }
+    
+    /// returns the 'DatabaseReference' of "users" Node Reference inside of your Firebase Database
+    static func nameNode() -> String? {
+        
         return "name"
     }
     

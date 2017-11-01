@@ -28,15 +28,7 @@ class UserCell: UITableViewCell {
     
     
     func setupNameAndProfileImage() {
-        var chatPartnerID : String?
-        
-        if message?.fromID == Auth.auth().currentUser?.uid {
-            chatPartnerID = message?.toID
-        } else {
-            chatPartnerID = message?.fromID
-        }
-        
-        if let id = chatPartnerID {
+        if let id = message?.chatPartnerID() {
             let ref = Database.database().reference().child("users").child(id)
             ref.observeSingleEvent(of: .value, with: { (snapshot) in
                 if let dictionary = snapshot.value as? [String: AnyObject] {
@@ -66,6 +58,8 @@ class UserCell: UITableViewCell {
         imageView.contentMode = .scaleAspectFill
         return imageView
     }()
+    
+
     
     private func setupConstrainsts() {
         

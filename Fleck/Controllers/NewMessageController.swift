@@ -24,7 +24,7 @@ class NewMessageController: UITableViewController {
     }
     
     func fetchUsers() {
-        let ref = Database.database().reference().child(FDNodeName.userNode())
+        let ref = FDNodeRef.userNode()
         ref.observe(.childAdded) { (snapshot) in
             if let dictionary = snapshot.value as? [String: AnyObject] {
                 var user = LocalUser()

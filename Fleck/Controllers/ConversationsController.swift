@@ -48,8 +48,8 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
                     message.timeStamp = dictionary["timestamp"] as? Int
                     message.toID = dictionary["toID"] as? String
                     //self.messages.append(message)
-                    if let toID = message.toID {
-                        self.messagesDictionary[toID] = message
+                    if let chatPartnerID = message.chatPartnerID() {
+                        self.messagesDictionary[chatPartnerID] = message
                         self.messages = Array(self.messagesDictionary.values)
                         self.messages.sort(by: { (message1, message2) -> Bool in
                             return message1.timeStamp! > message2.timeStamp!
@@ -90,7 +90,7 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
         guard let uid = Auth.auth().currentUser?.uid else {
             return
         }
-        let ref = Database.database().reference().child(FDNodeName.userNode()).child(uid)
+        let ref = FDNodeRef.userNode().child(uid)
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
             if let dictionary = snapshot.value as? [String: AnyObject] {
 //                self.navigationTitile = dictionary["name"] as? String
@@ -223,5 +223,26 @@ extension ConversationsController {
 extension ConversationsController {
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 76
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let message = messages[indexPath.row]
+        guard let chatPartnerID = message.chatPartnerID() else {
+            return
+        }
+        let ref = Database.database().reference().child("users").child(chatPartnerID)
+        ref.observeSingleEvent(of: .value) { (snapshot) in
+            guard let dictionary = snapshot.value as? [String: AnyObject] else {
+                return
+            }
+
+            var user = LocalUser()
+            user.id = chatPartnerID
+            user.name = dictionary["name"] as? String
+            user.email = dictionary["email"] as? String
+            user.profileImageURL = dictionary["profileImageUrl"] as? String
+            
+            self.showChatController(forUser: user)
+        }
     }
 }
