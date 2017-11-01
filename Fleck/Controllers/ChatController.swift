@@ -39,7 +39,10 @@ class ChatController: UICollectionViewController {
         collectionView?.register(ChatMessageCell.self, forCellWithReuseIdentifier: cellID)
         collectionView?.alwaysBounceVertical = true
         setupInputComponents()
+        setupKeyboardObservers()
     }
+    
+    var containerViewBottomAnchor: NSLayoutConstraint?
     
     //MARK: Setup Input Components
     func setupInputComponents() {
@@ -50,7 +53,8 @@ class ChatController: UICollectionViewController {
         
         //x,y,width,height
         containerView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
-        containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        containerViewBottomAnchor = containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        containerViewBottomAnchor?.isActive = true
         containerView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
         containerView.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
@@ -199,7 +203,6 @@ extension ChatController {
         }
     }
 }
-
 //Delegate
 extension ChatController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -207,7 +210,6 @@ extension ChatController: UICollectionViewDelegateFlowLayout {
         let padding: CGFloat = 20
         if let text = messages[indexPath.item].text {
             height = estimatedFrame(forText: text).height + padding
-            
         }
        return CGSize(width: view.frame.width, height: height!)
     }
@@ -223,5 +225,35 @@ extension ChatController: UICollectionViewDelegateFlowLayout {
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         collectionView?.collectionViewLayout.invalidateLayout() // good fix when using constraints
+    }
+}
+// Keyboard Logic
+extension ChatController {
+    func setupKeyboardObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardWillShow(withNotification:)), name: .UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardWillHide(withNotification:)), name: .UIKeyboardDidHide, object: nil)
+    }
+    @objc func handleKeyboardWillShow(withNotification notification: Notification) {
+        let keyboardFrame = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as AnyObject).cgRectValue
+        let keyboardDuration = (notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as AnyObject).doubleValue
+        containerViewBottomAnchor?.constant = -(keyboardFrame?.height)!
+        UIView.animate(withDuration: keyboardDuration!) {
+            self.view.layoutIfNeeded()
+        }
+    }
+    @objc func handleKeyboardWillHide(withNotification notification: Notification) {
+        let keyboardDuration = (notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as AnyObject).doubleValue
+        containerViewBottomAnchor?.constant = 0
+        UIView.animate(withDuration: keyboardDuration!) {
+            self.view.layoutIfNeeded()
+        }
+    }
+}
+
+//Invalidate Notification Observers
+extension ChatController {
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        NotificationCenter.default.removeObserver(self)
     }
 }
