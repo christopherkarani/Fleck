@@ -229,7 +229,6 @@ extension ChatController {
         } else if message.imageUrl != nil {
             cell.bubbleWidthAnchor?.constant = 200
         }
-        
 
         return cell
     }
