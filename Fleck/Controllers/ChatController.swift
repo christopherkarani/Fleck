@@ -174,12 +174,8 @@ class ChatController: UICollectionViewController {
                 guard let dictionary = snapshot.value as? [String: AnyObject] else {
                     return
                 }
-                var message = Message()
-                message.fromID = dictionary["fromID"] as? String
-                message.toID = dictionary["toID"] as? String
-                message.text = dictionary["text"] as? String
-                message.timeStamp = dictionary["timestamp"] as? Int
-                
+                var message = Message(dictionary: dictionary)
+
  
                 self.messages.append(message)
                 
@@ -249,14 +245,25 @@ extension ChatController {
         
         setupCell(withCell: cell, andMessage: message)
         
-        let padding: CGFloat = 32
-        cell.bubbleWidthAnchor?.constant = estimatedFrame(forText: message.text!).width + padding
+        if let text = message.text {
+            let padding: CGFloat = 32
+            cell.bubbleWidthAnchor?.constant = estimatedFrame(forText: text).width + padding
+        }
+        
+
         return cell
     }
     
     func setupCell(withCell cell: ChatMessageCell, andMessage message: Message) {
         if let profileImageURL = self.user?.profileImageURL {
             cell.profileImageView.loadImageUsingCache(withURLString: profileImageURL)
+        }
+        if let messageURL = message.imageUrl {
+            cell.messageImageView.loadImageUsingCache(withURLString: messageURL)
+            cell.messageImageView.isHidden = false
+            cell.bubbleView.backgroundColor = .clear
+        } else {
+            cell.messageImageView.isHidden = true
         }
         if message.fromID == Auth.auth().currentUser?.uid {
             cell.bubbleView.backgroundColor = Theme.chatBubbleOutgoing
@@ -351,11 +358,12 @@ extension ChatController: UIImagePickerControllerDelegate, UINavigationControlle
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         let imageData = handleSelectImage(withInfo: info)
-        handleUploadToFirebase(withData: imageData)
+        let image = imageData.image
+        handleUploadToFirebase(withData: imageData.data, andImage: image)
         
     }
     
-    func handleSelectImage(withInfo info : [String: Any]) -> Data {
+    func handleSelectImage(withInfo info : [String: Any]) -> (data: Data, image: UIImage) {
         var selectedImage : UIImage?
         if let editedImage = info[UIImagePickerControllerEditedImage] as? UIImage {
             selectedImage = editedImage
@@ -366,10 +374,10 @@ extension ChatController: UIImagePickerControllerDelegate, UINavigationControlle
             fatalError("Unable To convert image to data")
         }
         
-        return imageData
+        return (imageData, selectedImage!)
     }
     
-    func handleUploadToFirebase(withData data: Data) {
+    func handleUploadToFirebase(withData data: Data, andImage image: UIImage) {
         let imageName = UUID().uuidString;
         let ref = FDNodeRef.uploadMessageImage(withName: imageName)
 
@@ -378,8 +386,9 @@ extension ChatController: UIImagePickerControllerDelegate, UINavigationControlle
                 print(error!)
                 return
             }
+            
             if let imageUrl = metadata?.downloadURL()?.absoluteString {
-                 self.handleSendImage(withUrlString: imageUrl)
+                self.handleSendImage(withUrlString: imageUrl, andImage: image)
             }
             
             self.dismiss(animated: true, completion: nil)
@@ -388,7 +397,7 @@ extension ChatController: UIImagePickerControllerDelegate, UINavigationControlle
         
     }
     
-    private func handleSendImage(withUrlString urlString: String) {
+    private func handleSendImage(withUrlString urlString: String, andImage image: UIImage) {
         let ref = Database.database().reference().child("messages")
         let childRef = ref.childByAutoId()
         let toID = user!.id!
@@ -396,8 +405,10 @@ extension ChatController: UIImagePickerControllerDelegate, UINavigationControlle
         let timestamp = Int(Date().timeIntervalSince1970)
         let values: [String : Any] = ["toID": toID,
                                       "fromID": fromID,
+                                      "timestamp": timestamp,
                                       "imageUrl": urlString,
-                                      "timestamp": timestamp]
+                                      "imageWidth": image.size.width,
+                                      "imageHeight": image.size.height]
         childRef.updateChildValues(values) { (error, ref) in
             if error != nil {
                 print(error!)

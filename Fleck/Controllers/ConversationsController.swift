@@ -70,12 +70,7 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
         let messagesReferance = Database.database().reference().child("messages").child(messageID)
         messagesReferance.observeSingleEvent(of: .value, with: { (snapshot) in
             if let dictionary = snapshot.value as? [String: AnyObject] {
-                var message = Message()
-                message.fromID = dictionary["fromID"] as? String
-                message.text = dictionary["text"] as? String
-                message.timeStamp = dictionary["timestamp"] as? Int
-                message.toID = dictionary["toID"] as? String
-                //self.messages.append(message)
+                var message = Message(dictionary: dictionary)                //self.messages.append(message)
                 if let chatPartnerID = message.chatPartnerID() {
                     self.messagesDictionary[chatPartnerID] = message
                 }
