@@ -279,12 +279,12 @@ extension ChatController {
 //Delegate
 extension ChatController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        var height : CGFloat?
+        var height : CGFloat = 80
         let padding: CGFloat = 20
         if let text = messages[indexPath.item].text {
             height = estimatedFrame(forText: text).height + padding
         }
-       return CGSize(width: view.frame.width, height: height!)
+       return CGSize(width: view.frame.width, height: height)
     }
     
     func estimatedFrame(forText text: String) -> CGRect {
@@ -381,6 +381,8 @@ extension ChatController: UIImagePickerControllerDelegate, UINavigationControlle
             if let imageUrl = metadata?.downloadURL()?.absoluteString {
                  self.handleSendImage(withUrlString: imageUrl)
             }
+            
+            self.dismiss(animated: true, completion: nil)
        
         }
         
