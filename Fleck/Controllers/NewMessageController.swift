@@ -13,6 +13,7 @@ class NewMessageController: UITableViewController {
     var users = [LocalUser]()
     var cellID = "CellID"
     var conversationsDelegate: ConversationsControllerDelegate?
+    var chatController: ChatController?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,21 +27,26 @@ class NewMessageController: UITableViewController {
     func fetchUsers() {
         let ref = FDNodeRef.userNode()
         ref.observe(.childAdded) { (snapshot) in
-            if let dictionary = snapshot.value as? [String: AnyObject] {
-                var user = LocalUser()
-                user.id = snapshot.key
-                user.name = dictionary["name"] as? String
-                user.email = dictionary["email"] as? String
-                user.profileImageURL = dictionary["profileImageUrl"] as? String
-                self.users.append(user)
-                
-                DispatchQueue.main.async(execute: {
-                    self.tableView.reloadData()
-                }) 
-            }
+            self.setupDictionary(withSnapshot: snapshot)
         }
         
     }
+    private func setupDictionary(withSnapshot snapshot: (DataSnapshot)) {
+        if let dictionary = snapshot.value as? [String: AnyObject] {
+            var user = LocalUser()
+            user.id = snapshot.key
+            user.name = dictionary["name"] as? String
+            user.email = dictionary["email"] as? String
+            user.profileImageURL = dictionary["profileImageUrl"] as? String
+            self.users.append(user)
+            
+            DispatchQueue.main.async(execute: {
+                self.tableView.reloadData()
+            })
+        }
+
+    }
+    
     
     func setupNavigationItem() {
         let cancleButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(handleCancel))
@@ -57,18 +63,29 @@ extension NewMessageController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let myUser = users[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: cellID) as! UserCell
-        cell.textLabel?.text = myUser.name
-        cell.detailTextLabel?.text = myUser.email
-        if let profileImageURL = myUser.profileImageURL {
+        let customCell = cellSetup(forUser: myUser, withUserCell: cell)
+        return customCell
+    }
+    
+    private func cellSetup(forUser user: LocalUser, withUserCell cell : UserCell) -> UITableViewCell {
+        cell.textLabel?.text = user.name
+        cell.detailTextLabel?.text = user.email
+        if let profileImageURL = user.profileImageURL {
             cell.profileImageView.loadImageUsingCache(withURLString: profileImageURL)
         }
         return cell
     }
     
+    //MARK: Present ChatController, From Delegate
+    private func setupChatController(withUser user: LocalUser) {
+        chatController = ChatController()
+        self.conversationsDelegate?.showChatController(forUser: user, withChatController: chatController!)
+    }
+    
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         dismiss(animated: true) {
             let user = self.users[indexPath.row]
-            self.conversationsDelegate?.showChatController(forUser: user)
+            self.setupChatController(withUser: user)
         }
     }
 }

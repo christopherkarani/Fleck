@@ -12,14 +12,20 @@ import Firebase
 protocol ConversationsControllerDelegate: class {
     func setupNavigationBar(withUser user: LocalUser)
     func fetchUserSetupNavigationBar()
-    func showChatController(forUser user: LocalUser)
+    func showChatController(forUser user: LocalUser, withChatController chat: ChatController)
 }
 
 class ConversationsController: UITableViewController, ConversationsControllerDelegate {
     
     var messages = [Message]()
     var messagesDictionary = [String: Message]()
-    var cellID = "CellID"
+    var cellID : String = "CellID"
+    var timer : Timer?
+    var nameLabel : UILabel?
+    var profileImageView: UIImageView?
+    var chatController: ChatController?
+    
+    
     //MARK: VIEWDIDLOAD
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -45,7 +51,7 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
         }
     }
 
-    var timer : Timer?
+
     @objc func handleReload() {
         self.messages = Array(self.messagesDictionary.values)
         self.messages.sort(by: { (message1, message2) -> Bool in
@@ -113,6 +119,7 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
         
     }
     
+    //MARK: Setup NavigationBar(withUser:)
     func setupNavigationBar(withUser user: LocalUser) {
         messages.removeAll()
         messagesDictionary.removeAll()
@@ -129,12 +136,12 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
         titleView.translatesAutoresizingMaskIntoConstraints = false
 
    
-        let profileImageView = UIImageView()
-        profileImageView.layer.cornerRadius = 20
-        profileImageView.clipsToBounds = true
-        profileImageView.translatesAutoresizingMaskIntoConstraints = false
-        profileImageView.contentMode = .scaleAspectFill
-        profileImageView.loadImageUsingCache(withURLString: profileImageURLString)
+        profileImageView = UIImageView()
+        profileImageView?.layer.cornerRadius = 20
+        profileImageView?.clipsToBounds = true
+        profileImageView?.translatesAutoresizingMaskIntoConstraints = false
+        profileImageView?.contentMode = .scaleAspectFill
+        profileImageView?.loadImageUsingCache(withURLString: profileImageURLString)
         
         let containerView = UIView()
         containerView.translatesAutoresizingMaskIntoConstraints = false
@@ -142,26 +149,26 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
         
 
         
-        let nameLabel = UILabel()
-        nameLabel.text = user.name
-        nameLabel.translatesAutoresizingMaskIntoConstraints = false
+        nameLabel = UILabel()
+        nameLabel?.text = user.name
+        nameLabel?.translatesAutoresizingMaskIntoConstraints = false
 
         
-        containerView.addSubview(profileImageView)
-        containerView.addSubview(nameLabel)
+        containerView.addSubview(profileImageView!)
+        containerView.addSubview(nameLabel!)
 
         
         // nameLabel Constrainsts
-        nameLabel.leftAnchor.constraint(equalTo: profileImageView.rightAnchor, constant: 8).isActive = true
-        nameLabel.centerYAnchor.constraint(equalTo: profileImageView.centerYAnchor).isActive = true
-        nameLabel.rightAnchor.constraint(equalTo: containerView.rightAnchor).isActive = true
-        nameLabel.heightAnchor.constraint(equalTo: profileImageView.heightAnchor).isActive = true
+        nameLabel?.leftAnchor.constraint(equalTo: profileImageView!.rightAnchor, constant: 8).isActive = true
+        nameLabel?.centerYAnchor.constraint(equalTo: profileImageView!.centerYAnchor).isActive = true
+        nameLabel?.rightAnchor.constraint(equalTo: containerView.rightAnchor).isActive = true
+        nameLabel?.heightAnchor.constraint(equalTo: profileImageView!.heightAnchor).isActive = true
 
         //x,y,width,height
-        profileImageView.leftAnchor.constraint(equalTo: containerView.leftAnchor).isActive = true
-        profileImageView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor).isActive = true
-        profileImageView.widthAnchor.constraint(equalToConstant: 40).isActive = true
-        profileImageView.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        profileImageView?.leftAnchor.constraint(equalTo: containerView.leftAnchor).isActive = true
+        profileImageView?.centerYAnchor.constraint(equalTo: containerView.centerYAnchor).isActive = true
+        profileImageView?.widthAnchor.constraint(equalToConstant: 40).isActive = true
+        profileImageView?.heightAnchor.constraint(equalToConstant: 40).isActive = true
         
         // containerView Constraints
         containerView.centerYAnchor.constraint(equalTo: titleView.centerYAnchor).isActive = true
@@ -172,11 +179,9 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
   
     }
     
-     func showChatController(forUser user: LocalUser) {
-        let layout = UICollectionViewFlowLayout()
-        let chatController = ChatController(collectionViewLayout: layout)
-        chatController.user = user
-        navigationController?.pushViewController(chatController, animated: true)
+    func showChatController(forUser user: LocalUser, withChatController chat: ChatController) {
+        chatController!.user = user
+        navigationController?.pushViewController(chatController!, animated: true)
     }
     
     func setupNavigationItems() {
@@ -185,7 +190,7 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
         navigationItem.leftBarButtonItem = logoutButton
         navigationItem.rightBarButtonItem = composeButton
     }
-    
+    //HEYYY!!!!
     @objc func handleNewMessage() {
         let newMessageController = NewMessageController()
         newMessageController.conversationsDelegate = self
@@ -234,8 +239,9 @@ extension ConversationsController {
         return 76
     }
     
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let message = messages[indexPath.row]
+    private func fetchUserFromFirebase(withmessage message: Message) {
+        let layout = UICollectionViewFlowLayout()
+        self.chatController = ChatController(collectionViewLayout: layout)
         guard let chatPartnerID = message.chatPartnerID() else {
             return
         }
@@ -244,14 +250,18 @@ extension ConversationsController {
             guard let dictionary = snapshot.value as? [String: AnyObject] else {
                 return
             }
-
             var user = LocalUser()
             user.id = chatPartnerID
             user.name = dictionary["name"] as? String
             user.email = dictionary["email"] as? String
             user.profileImageURL = dictionary["profileImageUrl"] as? String
-            
-            self.showChatController(forUser: user)
+
+            self.showChatController(forUser: user, withChatController: self.chatController!)
         }
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let message = messages[indexPath.row]
+        fetchUserFromFirebase(withmessage: message)
     }
 }
