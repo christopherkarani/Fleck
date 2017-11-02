@@ -82,6 +82,11 @@ class ChatController: UICollectionViewController {
         collectionView?.keyboardDismissMode = .interactive
         //setupInputComponents()
         //setupKeyboardObservers()
+        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        view.addGestureRecognizer(tap)
+    }
+    @objc func dismissKeyboard() {
+        self.view.endEditing(true)
     }
     
     var containerViewBottomAnchor: NSLayoutConstraint?
@@ -133,10 +138,10 @@ class ChatController: UICollectionViewController {
     }
     
     func observerMessages() {
-        guard let uid = Auth.auth().currentUser?.uid else {
+        guard let uid = Auth.auth().currentUser?.uid, let toID = user?.id else {
             return
         }
-        let userMessageRef = Database.database().reference().child("user-messages").child(uid)
+        let userMessageRef = Database.database().reference().child("user-messages").child(uid).child(toID)
         userMessageRef.observe(.childAdded) { (snapshot) in
             let messageID = snapshot.key
             let messageRef = Database.database().reference().child("messages").child(messageID)
@@ -144,21 +149,18 @@ class ChatController: UICollectionViewController {
                 guard let dictionary = snapshot.value as? [String: AnyObject] else {
                     return
                 }
-       
                 var message = Message()
                 message.fromID = dictionary["fromID"] as? String
                 message.toID = dictionary["toID"] as? String
                 message.text = dictionary["text"] as? String
                 message.timeStamp = dictionary["timestamp"] as? Int
                 
-                if message.chatPartnerID() == self.user?.id {
-                    self.messages.append(message)
-                    
-                    DispatchQueue.main.async {
-                        self.collectionView?.reloadData()
-                    }
+ 
+                self.messages.append(message)
+                
+                DispatchQueue.main.async {
+                    self.collectionView?.reloadData()
                 }
-
             })
         }
     }
@@ -170,10 +172,11 @@ class ChatController: UICollectionViewController {
     ///
     @objc func handleSend() {
         
-        guard inputTextField.text != nil else {
+        guard let inputText = inputTextField.text, !inputText.isEmpty else {
             print("no text")
             return
         }
+
         let ref = Database.database().reference().child("messages")
         let childRef = ref.childByAutoId()
         let toID = user!.id!
@@ -181,7 +184,7 @@ class ChatController: UICollectionViewController {
         let timestamp = Int(Date().timeIntervalSince1970)
         let values: [String : Any] = ["toID": toID,
                       "fromID": fromID,
-                      "text": inputTextField.text!,
+                      "text": inputText,
                       "timestamp": timestamp] 
         childRef.updateChildValues(values) { (error, ref) in
             if error != nil {
@@ -190,11 +193,11 @@ class ChatController: UICollectionViewController {
             }
             self.inputTextField.text = nil
             
-            let userMessageRef = Database.database().reference().child("user-messages").child(fromID)
+            let userMessageRef = Database.database().reference().child("user-messages").child(fromID).child(toID)
             let messageID = childRef.key
             userMessageRef.updateChildValues([messageID: 1])
             
-            let recipientUserMessageRef = Database.database().reference().child("user-messages").child(toID)
+            let recipientUserMessageRef = Database.database().reference().child("user-messages").child(toID).child(fromID)
             recipientUserMessageRef.updateChildValues([messageID: 1])
         }
     }
