@@ -73,7 +73,6 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
                 //self.messages.append(message)
                 if let chatPartnerID = message.chatPartnerID() {
                     self.messagesDictionary[chatPartnerID] = message
-                    
                 }
                 self.attemptToReloadTable()
 
