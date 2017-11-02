@@ -162,6 +162,7 @@ class ChatController: UICollectionViewController {
   
     }
     
+    ///Observes The messages node and appends thoe messages to the 'messages' Array
     func observerMessages() {
         guard let uid = Auth.auth().currentUser?.uid, let toID = user?.id else {
             return
@@ -174,13 +175,13 @@ class ChatController: UICollectionViewController {
                 guard let dictionary = snapshot.value as? [String: AnyObject] else {
                     return
                 }
-                var message = Message(dictionary: dictionary)
-
- 
+                let message = Message(dictionary: dictionary)
                 self.messages.append(message)
                 
                 DispatchQueue.main.async {
                     self.collectionView?.reloadData()
+                    let indexPath = IndexPath(item: self.messages.count - 1, section: 0)
+                    self.collectionView?.scrollToItem(at: indexPath, at: .bottom, animated: true)
                 }
             })
         }
@@ -190,35 +191,12 @@ class ChatController: UICollectionViewController {
     ///Messages recieve a unique ID via 'childByAutoId()'
     ///
     @objc func handleSend() {
-        
         guard let inputText = inputTextField.text, !inputText.isEmpty else {
             print("no text")
             return
         }
-
-        let ref = Database.database().reference().child("messages")
-        let childRef = ref.childByAutoId()
-        let toID = user!.id!
-        let fromID = Auth.auth().currentUser!.uid
-        let timestamp = Int(Date().timeIntervalSince1970)
-        let values: [String : Any] = ["toID": toID,
-                      "fromID": fromID,
-                      "text": inputText,
-                      "timestamp": timestamp] 
-        childRef.updateChildValues(values) { (error, ref) in
-            if error != nil {
-                print(error!)
-                return
-            }
-            self.inputTextField.text = nil
-            
-            let userMessageRef = Database.database().reference().child("user-messages").child(fromID).child(toID)
-            let messageID = childRef.key
-            userMessageRef.updateChildValues([messageID: 1])
-            
-            let recipientUserMessageRef = Database.database().reference().child("user-messages").child(toID).child(fromID)
-            recipientUserMessageRef.updateChildValues([messageID: 1])
-        }
+        let properties: [String : Any] = ["text": inputText]
+        sendMessage(withProperties: properties)
     }
 
 }
@@ -248,6 +226,8 @@ extension ChatController {
         if let text = message.text {
             let padding: CGFloat = 32
             cell.bubbleWidthAnchor?.constant = estimatedFrame(forText: text).width + padding
+        } else if message.imageUrl != nil {
+            cell.bubbleWidthAnchor?.constant = 200
         }
         
 
@@ -288,8 +268,11 @@ extension ChatController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         var height : CGFloat = 80
         let padding: CGFloat = 20
-        if let text = messages[indexPath.item].text {
+        let message =  messages[indexPath.item]
+        if let text = message.text {
             height = estimatedFrame(forText: text).height + padding
+        } else if let imageHeight = message.imageHeight, let imageWidth = message.imageWidth {
+            height = CGFloat(imageHeight / imageWidth * 200)
         }
        return CGSize(width: view.frame.width, height: height)
     }
@@ -310,9 +293,15 @@ extension ChatController: UICollectionViewDelegateFlowLayout {
 // Keyboard Logic
 extension ChatController {
     func setupKeyboardObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardWillShow(withNotification:)), name: .UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardWillHide(withNotification:)), name: .UIKeyboardDidHide, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardDidShow), name: .UIKeyboardDidShow, object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardWillShow(withNotification:)), name: .UIKeyboardWillShow, object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardWillHide(withNotification:)), name: .UIKeyboardDidHide, object: nil)
     }
+    @objc func handleKeyboardDidShow() {
+        let indexPath = IndexPath(item: messages.count - 1, section: 0)
+        collectionView?.scrollToItem(at: indexPath, at: .top, animated: true)
+    }
+    
     @objc func handleKeyboardWillShow(withNotification notification: Notification) {
         let keyboardFrame = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as AnyObject).cgRectValue
         let keyboardDuration = (notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as AnyObject).doubleValue
@@ -398,17 +387,22 @@ extension ChatController: UIImagePickerControllerDelegate, UINavigationControlle
     }
     
     private func handleSendImage(withUrlString urlString: String, andImage image: UIImage) {
+        let properties: [String: Any] = ["imageUrl": urlString, "imageWidth": image.size.width, "imageHeight":image.size.height]
+        sendMessage(withProperties: properties)
+    }
+    
+    func sendMessage(withProperties properties : [String: Any]) {
         let ref = Database.database().reference().child("messages")
         let childRef = ref.childByAutoId()
         let toID = user!.id!
         let fromID = Auth.auth().currentUser!.uid
         let timestamp = Int(Date().timeIntervalSince1970)
-        let values: [String : Any] = ["toID": toID,
+        var values: [String : Any] = ["toID": toID,
                                       "fromID": fromID,
                                       "timestamp": timestamp,
-                                      "imageUrl": urlString,
-                                      "imageWidth": image.size.width,
-                                      "imageHeight": image.size.height]
+                                      ]
+        properties.forEach({values[$0.key] = $0.value})
+                                      
         childRef.updateChildValues(values) { (error, ref) in
             if error != nil {
                 print(error!)
