@@ -12,7 +12,7 @@ import Firebase
 protocol ConversationsControllerDelegate: class {
     func setupNavigationBar(withUser user: LocalUser)
     func fetchUserSetupNavigationBar()
-    func showChatController(forUser user: LocalUser, withChatController chat: ChatController)
+    func showChatController(forUser user: LocalUser)
 }
 
 class ConversationsController: UITableViewController, ConversationsControllerDelegate {
@@ -51,7 +51,6 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
         }
     }
 
-
     @objc func handleReload() {
         self.messages = Array(self.messagesDictionary.values)
         self.messages.sort(by: { (message1, message2) -> Bool in
@@ -86,7 +85,6 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
         })
     }
     
-    
     //MARK: VIEWDIDAPPEAR
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(true)
@@ -108,7 +106,6 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
         let ref = FDNodeRef.userNode().child(uid)
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
             if let dictionary = snapshot.value as? [String: AnyObject] {
-//                self.navigationTitile = dictionary["name"] as? String
                 var user = LocalUser()
                 user.name = dictionary["name"] as? String
                 user.email = dictionary["email"] as? String
@@ -116,11 +113,11 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
                 self.setupNavigationBar(withUser: user)
             }
         })
-        
     }
     
     //MARK: Setup NavigationBar(withUser:)
     func setupNavigationBar(withUser user: LocalUser) {
+        //clean up before reloading
         messages.removeAll()
         messagesDictionary.removeAll()
         tableView.reloadData()
@@ -147,7 +144,6 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
         containerView.translatesAutoresizingMaskIntoConstraints = false
         titleView.addSubview(containerView)
         
-
         
         nameLabel = UILabel()
         nameLabel?.text = user.name
@@ -157,7 +153,6 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
         containerView.addSubview(profileImageView!)
         containerView.addSubview(nameLabel!)
 
-        
         // nameLabel Constrainsts
         nameLabel?.leftAnchor.constraint(equalTo: profileImageView!.rightAnchor, constant: 8).isActive = true
         nameLabel?.centerYAnchor.constraint(equalTo: profileImageView!.centerYAnchor).isActive = true
@@ -179,7 +174,9 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
   
     }
     
-    func showChatController(forUser user: LocalUser, withChatController chat: ChatController) {
+    func showChatController(forUser user: LocalUser) {
+        let layout = UICollectionViewFlowLayout()
+        self.chatController = ChatController(collectionViewLayout: layout)
         chatController!.user = user
         navigationController?.pushViewController(chatController!, animated: true)
     }
@@ -240,8 +237,7 @@ extension ConversationsController {
     }
     
     private func fetchUserFromFirebase(withmessage message: Message) {
-        let layout = UICollectionViewFlowLayout()
-        self.chatController = ChatController(collectionViewLayout: layout)
+
         guard let chatPartnerID = message.chatPartnerID() else {
             return
         }
@@ -256,7 +252,7 @@ extension ConversationsController {
             user.email = dictionary["email"] as? String
             user.profileImageURL = dictionary["profileImageUrl"] as? String
 
-            self.showChatController(forUser: user, withChatController: self.chatController!)
+            self.showChatController(forUser: user)
         }
     }
     

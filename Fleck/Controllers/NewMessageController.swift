@@ -2,7 +2,7 @@
 //  NewMessageController.swift
 //  Fleck
 //
-//  Created by macuser1 on 26/10/2017.
+//  Created by chris karani on 26/10/2017.
 //  Copyright © 2017 Neptune. All rights reserved.
 //
 
@@ -14,6 +14,7 @@ class NewMessageController: UITableViewController {
     var cellID = "CellID"
     var conversationsDelegate: ConversationsControllerDelegate?
     var chatController: ChatController?
+    var heightForRows: CGFloat = 70
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -47,7 +48,6 @@ class NewMessageController: UITableViewController {
 
     }
     
-    
     func setupNavigationItem() {
         let cancleButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(handleCancel))
         navigationItem.leftBarButtonItem = cancleButton
@@ -77,19 +77,14 @@ extension NewMessageController {
     }
     
     //MARK: Present ChatController, From Delegate
-    private func setupChatController(withUser user: LocalUser) {
-        chatController = ChatController()
-        self.conversationsDelegate?.showChatController(forUser: user, withChatController: chatController!)
-    }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         dismiss(animated: true) {
             let user = self.users[indexPath.row]
-            self.setupChatController(withUser: user)
+            self.conversationsDelegate?.showChatController(forUser: user)
         }
     }
 }
-
 //MARK: DATASOURCE
 extension NewMessageController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -97,6 +92,6 @@ extension NewMessageController {
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 70
+        return heightForRows
     }
 }

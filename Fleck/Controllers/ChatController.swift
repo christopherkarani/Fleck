@@ -18,13 +18,12 @@ class ChatController: UICollectionViewController {
         }
     }
     var messages = [Message]()
-    
-
     let cellID = "cellID"
     
     lazy var inputTextField : UITextField = {
         let textField = UITextField()
         textField.placeholder = "Send a message to \(String(describing: self.user!.name!))..."
+        textField.font = UIFont.systemFont(ofSize: 15)
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.delegate = self
         return textField
@@ -43,6 +42,32 @@ class ChatController: UICollectionViewController {
         sendButton.addTarget(self, action: #selector(handleSend), for: .touchUpInside)
         containerView.addSubview(sendButton)
         
+        let uploadImageView = UIImageView()
+        uploadImageView.image = Theme.UploadImage
+        uploadImageView.translatesAutoresizingMaskIntoConstraints = false
+        
+        let imageViewTouchArea = UIView()
+        imageViewTouchArea.translatesAutoresizingMaskIntoConstraints = false
+        imageViewTouchArea.isUserInteractionEnabled = true
+        let tap = UITapGestureRecognizer(target: self, action: #selector(handleUploadImage))
+        imageViewTouchArea.addGestureRecognizer(tap)
+        
+        imageViewTouchArea.addSubview(uploadImageView)
+        
+        //x,y,w,h uploadImageView Constraints
+        uploadImageView.leftAnchor.constraint(equalTo: imageViewTouchArea.leftAnchor, constant: 14).isActive = true
+        uploadImageView.centerYAnchor.constraint(equalTo: imageViewTouchArea.centerYAnchor).isActive = true
+        uploadImageView.widthAnchor.constraint(equalToConstant: 28).isActive = true
+        uploadImageView.heightAnchor.constraint(equalToConstant: 28).isActive = true
+        
+        containerView.addSubview(imageViewTouchArea)
+        
+        //x,y,w,h imageViewTouchArea Constraints
+        imageViewTouchArea.leftAnchor.constraint(equalTo: containerView.leftAnchor).isActive = true
+        imageViewTouchArea.centerYAnchor.constraint(equalTo: containerView.centerYAnchor).isActive = true
+        imageViewTouchArea.widthAnchor.constraint(equalToConstant: 44).isActive = true
+        imageViewTouchArea.heightAnchor.constraint(equalToConstant: 44).isActive = true
+        
         //x,y,w,h
         sendButton.rightAnchor.constraint(equalTo: containerView.rightAnchor).isActive = true
         sendButton.centerYAnchor.constraint(equalTo: containerView.centerYAnchor).isActive = true
@@ -52,7 +77,7 @@ class ChatController: UICollectionViewController {
         containerView.addSubview(inputTextField)
         
         //x,y,w,h
-        self.inputTextField.leftAnchor.constraint(equalTo: containerView.leftAnchor, constant: 8).isActive = true
+        self.inputTextField.leftAnchor.constraint(equalTo: imageViewTouchArea.rightAnchor, constant: 8).isActive = true
         self.inputTextField.centerYAnchor.constraint(equalTo: containerView.centerYAnchor).isActive = true
         self.inputTextField.rightAnchor.constraint(equalTo: sendButton.leftAnchor).isActive = true
         self.inputTextField.heightAnchor.constraint(equalTo: containerView.heightAnchor).isActive = true
@@ -75,7 +100,7 @@ class ChatController: UICollectionViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         collectionView?.contentInset = UIEdgeInsets(top: 8, left: 0, bottom: 8 , right: 0)
-
+    
         collectionView?.backgroundColor = .white
         collectionView?.register(ChatMessageCell.self, forCellWithReuseIdentifier: cellID)
         collectionView?.alwaysBounceVertical = true
@@ -164,8 +189,6 @@ class ChatController: UICollectionViewController {
             })
         }
     }
-    
-    
     //MARK: SEND FUNCTION
     ///Handles Sending to the Firebase database. Messages are stored inside the "messages" node
     ///Messages recieve a unique ID via 'childByAutoId()'
@@ -315,6 +338,82 @@ extension ChatController {
     // if we dont set this, accesorry view is not visibile
     override var canBecomeFirstResponder: Bool {
         return true
+    }
+}
+//ImagePicker
+extension ChatController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    @objc func handleUploadImage() {
+        let picker = UIImagePickerController()
+        picker.delegate = self
+        picker.allowsEditing = true
+        present(picker, animated: true, completion: nil)
+    }
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+        let imageData = handleSelectImage(withInfo: info)
+        handleUploadToFirebase(withData: imageData)
+        
+    }
+    
+    func handleSelectImage(withInfo info : [String: Any]) -> Data {
+        var selectedImage : UIImage?
+        if let editedImage = info[UIImagePickerControllerEditedImage] as? UIImage {
+            selectedImage = editedImage
+        } else if let originalImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
+            selectedImage = originalImage
+        }
+        guard let imageData = UIImageJPEGRepresentation(selectedImage!, 0.2) else {
+            fatalError("Unable To convert image to data")
+        }
+        
+        return imageData
+    }
+    
+    func handleUploadToFirebase(withData data: Data) {
+        let imageName = UUID().uuidString;
+        let ref = FDNodeRef.uploadMessageImage(withName: imageName)
+
+        ref.putData(data, metadata: nil) { (metadata, error) in
+            if error != nil  {
+                print(error!)
+                return
+            }
+            if let imageUrl = metadata?.downloadURL()?.absoluteString {
+                 self.handleSendImage(withUrlString: imageUrl)
+            }
+       
+        }
+        
+    }
+    
+    private func handleSendImage(withUrlString urlString: String) {
+        let ref = Database.database().reference().child("messages")
+        let childRef = ref.childByAutoId()
+        let toID = user!.id!
+        let fromID = Auth.auth().currentUser!.uid
+        let timestamp = Int(Date().timeIntervalSince1970)
+        let values: [String : Any] = ["toID": toID,
+                                      "fromID": fromID,
+                                      "imageUrl": urlString,
+                                      "timestamp": timestamp]
+        childRef.updateChildValues(values) { (error, ref) in
+            if error != nil {
+                print(error!)
+                return
+            }
+            self.inputTextField.text = nil
+            
+            let userMessageRef = Database.database().reference().child("user-messages").child(fromID).child(toID)
+            let messageID = childRef.key
+            userMessageRef.updateChildValues([messageID: 1])
+            
+            let recipientUserMessageRef = Database.database().reference().child("user-messages").child(toID).child(fromID)
+            recipientUserMessageRef.updateChildValues([messageID: 1])
+        }
+    }
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        dismiss(animated: true, completion: nil)
     }
 }
 
