@@ -9,6 +9,10 @@
 import UIKit
 import Firebase
 
+protocol ChatControllerDelegate: class {
+    func performZoom(forSatringImage image: UIImageView)
+}
+
 class ChatController: UICollectionViewController {
     
     var user : LocalUser? {
@@ -106,7 +110,7 @@ class ChatController: UICollectionViewController {
         collectionView?.alwaysBounceVertical = true
         collectionView?.keyboardDismissMode = .interactive
         //setupInputComponents()
-        //setupKeyboardObservers()
+        setupKeyboardObservers()
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         view.addGestureRecognizer(tap)
     }
@@ -234,16 +238,21 @@ extension ChatController {
     }
     
     func setupCell(withCell cell: ChatMessageCell, andMessage message: Message) {
+        cell.chatDelegate = self
+        
         if let profileImageURL = self.user?.profileImageURL {
             cell.profileImageView.loadImageUsingCache(withURLString: profileImageURL)
         }
         if let messageURL = message.imageUrl {
+            cell.bubbleView.backgroundColor = .clear
             cell.messageImageView.loadImageUsingCache(withURLString: messageURL)
             cell.messageImageView.isHidden = false
-            cell.bubbleView.backgroundColor = .clear
+            cell.textView.isHidden = true
         } else {
             cell.messageImageView.isHidden = true
+            cell.textView.isHidden = false
         }
+        
         if message.fromID == Auth.auth().currentUser?.uid {
             cell.bubbleView.backgroundColor = Theme.chatBubbleOutgoing
             cell.textView.textColor = .white
@@ -420,6 +429,13 @@ extension ChatController: UIImagePickerControllerDelegate, UINavigationControlle
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         dismiss(animated: true, completion: nil)
+    }
+}
+
+//handle zoom on tap image
+extension ChatController: ChatControllerDelegate {
+    func performZoom(forSatringImage image: UIImageView) {
+       
     }
 }
 

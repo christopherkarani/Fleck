@@ -13,6 +13,7 @@ protocol ConversationsControllerDelegate: class {
     func setupNavigationBar(withUser user: LocalUser)
     func fetchUserSetupNavigationBar()
     func showChatController(forUser user: LocalUser)
+    
 }
 
 class ConversationsController: UITableViewController, ConversationsControllerDelegate {
@@ -255,3 +256,5 @@ extension ConversationsController {
         fetchUserFromFirebase(withmessage: message)
     }
 }
+
+
