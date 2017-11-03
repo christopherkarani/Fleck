@@ -9,9 +9,11 @@
 import Foundation
 import Firebase
 
-class FDNodeRef {
+final class FDNodeRef {
     
     static let shared = FDNodeRef()
+    
+    private init() {}
     
     func returnRootNode() -> DatabaseReference {
         return Database.database().reference()
@@ -32,11 +34,6 @@ class FDNodeRef {
             return Storage.storage().reference().child("message_images")
         }
     }
-    
-    /// returns the storage reference path where images sent from messages are stored
-//    func uploadMessageImage(withName name: String) -> StorageReference {
-//        return uploadMesaageImageNode().child("\(name).jpg")
-//    }
     
     func messagesNode() -> DatabaseReference {
         return  Database.database().reference().child("messages")
