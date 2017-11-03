@@ -102,10 +102,7 @@ extension LoginViewController {
                 return
             }
 
-            // generate a unique string
-            let imageName = UUID().uuidString
-            //Store ImageInto Firebase DB
-            let storageRef = Storage.storage().reference().child("Profile_Images").child("\(imageName).jpg")
+            let storageRef = FDNodeRef.shared.profileImagesStorageRef(toStoragePath: true)
             storageRef.putData(uploadData, metadata: nil, completion: { (metadata, error) in
                 if error != nil {
                     print(error!)
@@ -122,7 +119,7 @@ extension LoginViewController {
     
      /// Register Users to database
     func registerUserIntoDatabase(withUID id: String, andValues values: [String:String]) {
-        let usersRef = FDNodeRef.userNode().child(id)
+        let usersRef = FDNodeRef.shared.userNode().child(id)
         usersRef.updateChildValues(values, withCompletionBlock: { (error, ref) in
             if error != nil {
                 print(error!)

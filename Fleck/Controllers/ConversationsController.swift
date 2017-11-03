@@ -98,7 +98,7 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
         guard let uid = Auth.auth().currentUser?.uid else {
             return
         }
-        let ref = FDNodeRef.userNode().child(uid)
+        let ref = FDNodeRef.shared.userNode().child(uid)
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
             if let dictionary = snapshot.value as? [String: AnyObject] {
                 var user = LocalUser()

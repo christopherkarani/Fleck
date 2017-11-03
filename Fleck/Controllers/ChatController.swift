@@ -10,7 +10,7 @@ import UIKit
 import Firebase
 
 protocol ChatControllerDelegate: class {
-    func performZoom(forSatringImage image: UIImageView)
+    func performZoom(forSatringImage imageView: UIImageView)
 }
 
 class ChatController: UICollectionViewController {
@@ -375,9 +375,7 @@ extension ChatController: UIImagePickerControllerDelegate, UINavigationControlle
     }
     
     func handleUploadToFirebase(withData data: Data, andImage image: UIImage) {
-        let imageName = UUID().uuidString;
-        let ref = FDNodeRef.uploadMessageImage(withName: imageName)
-
+        let ref = FDNodeRef.shared.uploadMesaageImageNode(toStorage: true)
         ref.putData(data, metadata: nil) { (metadata, error) in
             if error != nil  {
                 print(error!)
@@ -400,8 +398,8 @@ extension ChatController: UIImagePickerControllerDelegate, UINavigationControlle
     }
     
     func sendMessage(withProperties properties : [String: Any]) {
-        let ref = Database.database().reference().child("messages")
-        let childRef = ref.childByAutoId()
+        let messageRef = Database.database().reference().child("messages")
+        let childRef = messageRef.childByAutoId()
         let toID = user!.id!
         let fromID = Auth.auth().currentUser!.uid
         let timestamp = Int(Date().timeIntervalSince1970)
@@ -434,8 +432,9 @@ extension ChatController: UIImagePickerControllerDelegate, UINavigationControlle
 
 //handle zoom on tap image
 extension ChatController: ChatControllerDelegate {
-    func performZoom(forSatringImage image: UIImageView) {
-       
+    func performZoom(forSatringImage imageView: UIImageView) {
+       let startingFrame = imageView.superview?.convert(imageView.frame, from: nil)
+        print(startingFrame)
     }
 }
 
