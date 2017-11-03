@@ -20,8 +20,10 @@ final class FDNodeRef {
     }
     
     /// returns the 'DatabaseReference' of "users" Node Reference inside of your Firebase Database
-    func userNode() -> DatabaseReference {
-        return  Database.database().reference().child("users")
+    func userNode(toChild: String? = nil) -> DatabaseReference {
+        let ref = Database.database().reference().child("users")
+        if let child = toChild { return ref.child(child) }
+        return  ref
     }
     
     /// returns the 'StorageReference' of "message_images" Node Reference inside of your Firebase Storage
@@ -35,17 +37,32 @@ final class FDNodeRef {
         }
     }
     
-    func messagesNode() -> DatabaseReference {
-        return  Database.database().reference().child("messages")
+    func messagesNode(toChild: String? = nil) -> DatabaseReference {
+        let ref = Database.database().reference().child("messages")
+        if let child = toChild { return ref.child(child)  }
+        return  ref
+    }
+    
+    func userMessagesNode(toChild: String? = nil, anotherChild: String? = nil) -> DatabaseReference {
+        let ref = Database.database().reference().child("user-messages")
+        if let child = toChild {
+            let childRef = ref.child(child)
+            if let secondChild = anotherChild {
+                return childRef.child(secondChild)
+            }
+            return childRef
+        }
+        return ref
     }
     
     func profileImagesStorageRef(toStoragePath: Bool) -> StorageReference {
+        let ref = Storage.storage().reference().child("Profile_Images")
         switch toStoragePath {
         case true:
             let imageName = UUID().uuidString
-            return Storage.storage().reference().child("Profile_Images").child("\(imageName).jpg")
+            return ref.child("\(imageName).jpg")
         case false:
-           return Storage.storage().reference().child("Profile_Images")
+           return ref
         }
     }
     

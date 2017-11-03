@@ -24,6 +24,10 @@ class ChatController: UICollectionViewController {
     var messages = [Message]()
     let cellID = "cellID"
     
+    private var startingFrame: CGRect?
+    private var backgroundView: UIView?
+    private var startingImageView: UIImageView?
+    
     lazy var inputTextField : UITextField = {
         let textField = UITextField()
         textField.placeholder = "Send a message to \(String(describing: self.user!.name!))..."
@@ -185,7 +189,10 @@ class ChatController: UICollectionViewController {
                 DispatchQueue.main.async {
                     self.collectionView?.reloadData()
                     let indexPath = IndexPath(item: self.messages.count - 1, section: 0)
-                    self.collectionView?.scrollToItem(at: indexPath, at: .bottom, animated: true)
+                    if self.messages.count >= 1 {
+                        self.collectionView?.scrollToItem(at: indexPath, at: .bottom, animated: true)
+                    }
+         
                 }
             })
         }
@@ -307,7 +314,10 @@ extension ChatController {
     }
     @objc func handleKeyboardDidShow() {
         let indexPath = IndexPath(item: messages.count - 1, section: 0)
-        collectionView?.scrollToItem(at: indexPath, at: .top, animated: true)
+        if messages.count >= 1 {
+            collectionView?.scrollToItem(at: indexPath, at: .top, animated: true)
+        }
+     
     }
     
     @objc func handleKeyboardWillShow(withNotification notification: Notification) {
@@ -398,7 +408,7 @@ extension ChatController: UIImagePickerControllerDelegate, UINavigationControlle
     }
     
     func sendMessage(withProperties properties : [String: Any]) {
-        let messageRef = Database.database().reference().child("messages")
+        let messageRef = FDNodeRef.shared.messagesNode()
         let childRef = messageRef.childByAutoId()
         let toID = user!.id!
         let fromID = Auth.auth().currentUser!.uid
@@ -415,12 +425,11 @@ extension ChatController: UIImagePickerControllerDelegate, UINavigationControlle
                 return
             }
             self.inputTextField.text = nil
-            
-            let userMessageRef = Database.database().reference().child("user-messages").child(fromID).child(toID)
+            let userMessageRef = FDNodeRef.shared.userMessagesNode(toChild: fromID, anotherChild: toID)
             let messageID = childRef.key
             userMessageRef.updateChildValues([messageID: 1])
             
-            let recipientUserMessageRef = Database.database().reference().child("user-messages").child(toID).child(fromID)
+            let recipientUserMessageRef = FDNodeRef.shared.userMessagesNode(toChild: toID, anotherChild: fromID)
             recipientUserMessageRef.updateChildValues([messageID: 1])
         }
     }
@@ -433,8 +442,47 @@ extension ChatController: UIImagePickerControllerDelegate, UINavigationControlle
 //handle zoom on tap image
 extension ChatController: ChatControllerDelegate {
     func performZoom(forSatringImage imageView: UIImageView) {
-       let startingFrame = imageView.superview?.convert(imageView.frame, from: nil)
-        print(startingFrame)
+        startingImageView = imageView
+        startingImageView?.isHidden = true
+        startingFrame = imageView.superview?.convert(imageView.frame, to: nil)
+        let zoomingImageView = UIImageView(frame: startingFrame!)
+        zoomingImageView.backgroundColor = .blue
+        zoomingImageView.image = imageView.image
+        zoomingImageView.isUserInteractionEnabled = true
+        zoomingImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTapZoom(withTap:))))
+
+        if let keyWindow = UIApplication.shared.keyWindow {
+            backgroundView = UIView(frame: keyWindow.frame)
+            backgroundView?.backgroundColor = .black
+            backgroundView?.alpha = 0
+            keyWindow.addSubview(backgroundView!)
+            keyWindow.addSubview(zoomingImageView)
+
+            
+            UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
+                self.backgroundView?.alpha = 1
+                self.inputContainerView.alpha = 0
+                let height = self.startingFrame!.height / self.startingFrame!.width * keyWindow.frame.width
+                
+                zoomingImageView.frame = CGRect(x: 0, y: 0, width: keyWindow.frame.width, height: height)
+                zoomingImageView.center = keyWindow.center
+            }, completion: nil  )
+        }
+    }
+    
+    @objc func handleTapZoom(withTap tap : UITapGestureRecognizer) {
+        if let zoomOutImageView = tap.view {
+            zoomOutImageView.layer.cornerRadius = 16
+            zoomOutImageView.clipsToBounds = true
+            UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
+                zoomOutImageView.frame = self.startingFrame!
+                self.backgroundView?.alpha = 0
+                self.inputContainerView.alpha = 1
+            }, completion: { (completed: Bool) in
+                zoomOutImageView.removeFromSuperview()
+                self.startingImageView?.isHidden = false
+            })
+        }
     }
 }
 

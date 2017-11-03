@@ -42,10 +42,10 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
         guard let uid = Auth.auth().currentUser?.uid  else {
             return
         }
-        let ref = Database.database().reference().child("user-messages").child(uid)
+        let ref = FDNodeRef.shared.userMessagesNode().child(uid)
         ref.observe(.childAdded) { (snapshot) in
             let userID = snapshot.key
-            Database.database().reference().child("user-messages").child(uid).child(userID).observe(.childAdded, with: { (snapshot) in
+            FDNodeRef.shared.userMessagesNode().child(uid).child(userID).observe(.childAdded, with: { (snapshot) in
                 let messageID = snapshot.key
                 self.fetchMessage(withMessageID: messageID)
             })
@@ -68,7 +68,7 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
     }
     
     private func fetchMessage(withMessageID messageID: String) {
-        let messagesReferance = Database.database().reference().child("messages").child(messageID)
+        let messagesReferance = FDNodeRef.shared.messagesNode(toChild: messageID)
         messagesReferance.observeSingleEvent(of: .value, with: { (snapshot) in
             if let dictionary = snapshot.value as? [String: AnyObject] {
                 let message = Message(dictionary: dictionary)                //self.messages.append(message)
@@ -98,7 +98,7 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
         guard let uid = Auth.auth().currentUser?.uid else {
             return
         }
-        let ref = FDNodeRef.shared.userNode().child(uid)
+        let ref = FDNodeRef.shared.userNode(toChild: uid)
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
             if let dictionary = snapshot.value as? [String: AnyObject] {
                 var user = LocalUser()
@@ -236,7 +236,7 @@ extension ConversationsController {
         guard let chatPartnerID = message.chatPartnerID() else {
             return
         }
-        let ref = Database.database().reference().child("users").child(chatPartnerID)
+        let ref = FDNodeRef.shared.userNode(toChild: chatPartnerID)
         ref.observeSingleEvent(of: .value) { (snapshot) in
             guard let dictionary = snapshot.value as? [String: AnyObject] else {
                 return
