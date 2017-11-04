@@ -165,7 +165,6 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
         containerView.centerYAnchor.constraint(equalTo: titleView.centerYAnchor).isActive = true
         containerView.centerXAnchor.constraint(equalTo: titleView.centerXAnchor).isActive = true
         
-        
         self.navigationItem.titleView = titleView
   
     }
