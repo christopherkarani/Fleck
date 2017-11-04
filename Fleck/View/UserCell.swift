@@ -13,7 +13,6 @@ class UserCell: UITableViewCell {
     
     var message : Message? {
         didSet {
-
             setupNameAndProfileImage()
             detailTextLabel?.text = message?.text
             if let seconds = message?.timeStamp {

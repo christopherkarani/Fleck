@@ -180,7 +180,7 @@ class ChatController: UICollectionViewController {
         let userMessageRef = FDNodeRef.shared.userMessagesNode(toChild: uid, anotherChild: toID)
         userMessageRef.observe(.childAdded) { (snapshot) in
             let messageID = snapshot.key
-            let messageRef = Database.database().reference().child("messages").child(messageID)
+            let messageRef = FDNodeRef.shared.messagesNode(toChild: messageID)
             messageRef.observeSingleEvent(of: .value, with: { (snapshot) in
                 guard let dictionary = snapshot.value as? [String: AnyObject] else {
                     return
@@ -372,26 +372,23 @@ extension ChatController: UIImagePickerControllerDelegate, UINavigationControlle
             handleSelectedVideo(withUrl: videoUrl)
         } else {
             //we selected an image
-            let imageData = handleSelectImage(withInfo: info)
-            let image = imageData.image
-            handleUploadToFirebase(withData: data, andImage: imag, completion: nil)
+            let image = handleSelectImage(withInfo: info)
+            handleUploadToFirebase(withImage: image, completion: { (imageUrl) in
+                self.handleSendImage(withUrlString: imageUrl, andImage: image)
+            })
         }
         
         
     }
     
-    func handleSelectImage(withInfo info : [String: Any]) -> (data: Data, image: UIImage) {
+    func handleSelectImage(withInfo info : [String: Any]) ->  UIImage {
         var selectedImage : UIImage?
         if let editedImage = info[UIImagePickerControllerEditedImage] as? UIImage {
             selectedImage = editedImage
         } else if let originalImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
             selectedImage = originalImage
         }
-        guard let imageData = UIImageJPEGRepresentation(selectedImage!, 0.2) else {
-            fatalError("Unable To convert image to data")
-        }
-        
-        return (imageData, selectedImage!)
+        return selectedImage!
     }
     
     func handleSelectedVideo(withUrl url: URL) {
@@ -404,17 +401,13 @@ extension ChatController: UIImagePickerControllerDelegate, UINavigationControlle
                     print(error!)
                     return
                 }
-                
-
-
                 if let videoUrl = metadata?.downloadURL()?.absoluteString {
                     if let thumbnailImage = self.thumbnail(forImageUrl: url) {
-                        //"imageUrl": urlString,
-                        let properties : [String: Any] =  ["videoUrl": videoUrl, "imageWidth": thumbnailImage.size.width, "imageHeight": thumbnailImage.size.height]
-                        self.sendMessage(withProperties: properties)
+                        self.handleUploadToFirebase(withImage: thumbnailImage, completion: { (imageUrlString) in
+                            let properties : [String: Any] =  ["videoUrl": videoUrl, "imageWidth": thumbnailImage.size.width, "imageHeight": thumbnailImage.size.height, "imageUrl": imageUrlString]
+                            self.sendMessage(withProperties: properties)
+                        })
                     }
-                    
-                    
                 }
             })
         
@@ -447,17 +440,20 @@ extension ChatController: UIImagePickerControllerDelegate, UINavigationControlle
         return nil
     }
 
-    func handleUploadToFirebase(withData data: Data, andImage image: UIImage, completion: ((_ imageUrl: String) -> Void)?) {
+    func handleUploadToFirebase(withImage image: UIImage, completion: ((_ imageUrl: String) -> Void)?) {
+        guard let imageData = UIImageJPEGRepresentation(image, 0.2) else {
+            fatalError("Unable To convert image to data")
+        }
         let ref = FDNodeRef.shared.uploadMesaageImageNode(toStorage: true)
-        ref.putData(data, metadata: nil) { (metadata, error) in
+        ref.putData(imageData, metadata: nil) { (metadata, error) in
             if error != nil  {
                 print(error!)
                 return
             }
             
-            if let urlString = metadata?.downloadURL()?.absoluteString {
-                completion?(urlString)
-                self.handleSendImage(withUrlString: urlString, andImage: image)
+            if let imageUrlString = metadata?.downloadURL()?.absoluteString {
+                completion?(imageUrlString)
+                
             }
             
             self.dismiss(animated: true, completion: nil)

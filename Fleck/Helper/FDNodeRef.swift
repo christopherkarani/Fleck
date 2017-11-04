@@ -15,6 +15,20 @@ final class FDNodeRef {
     
     private init() {}
     
+    var loggedIn: Bool {
+        return Auth.auth().currentUser != nil ? true : false 
+    }
+    
+    static var currentUserUID : String = Auth.auth().currentUser!.uid
+    
+    func signOut() {
+        do {
+            try Auth.auth().signOut()
+        } catch let logoutError {
+            print(logoutError)
+        }
+    }
+    
     func returnRootNode() -> DatabaseReference {
         return Database.database().reference()
     }

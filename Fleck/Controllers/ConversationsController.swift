@@ -24,24 +24,25 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
     var timer : Timer?
     var nameLabel : UILabel?
     var profileImageView: UIImageView?
-    var chatController: ChatController?
+    weak var chatController: ChatController?
+    weak var newMessageController: NewMessageController?
+    weak var loginController : LoginViewController?
     
     
     //MARK: VIEWDIDLOAD
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         view.backgroundColor = .white
         tableView.register(UserCell.self, forCellReuseIdentifier: cellID)
-        setupNavigationItems()
         checkIfUserIsLoggedIn()
+        setupNavigationItems()
         observeUserMessages()
   
     }
     
     func observeUserMessages() {
-        guard let uid = Auth.auth().currentUser?.uid  else {
-            return
-        }
+        let uid = FDNodeRef.currentUserUID
         let ref = FDNodeRef.shared.userMessagesNode().child(uid)
         ref.observe(.childAdded) { (snapshot) in
             let userID = snapshot.key
@@ -184,9 +185,9 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
     }
     //HEYYY!!!!
     @objc func handleNewMessage() {
-        let newMessageController = NewMessageController()
-        newMessageController.conversationsDelegate = self
-        let navController = UINavigationController(rootViewController: newMessageController)
+        newMessageController = NewMessageController()
+        newMessageController?.conversationsDelegate = self
+        let navController = UINavigationController(rootViewController: newMessageController!)
         present(navController, animated: true, completion: nil)
     }
     
@@ -198,9 +199,9 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
             print(logoutError)
         }
         
-        let loginController = LoginViewController()
-        loginController.delegate = self
-        present(loginController, animated: true) {
+        loginController = LoginViewController()
+        loginController?.delegate = self
+        present(loginController!, animated: true) {
             // Delete Keys from key chain.
             // End Session
             // Lock Screen
@@ -209,7 +210,6 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        
     }
 }
 
