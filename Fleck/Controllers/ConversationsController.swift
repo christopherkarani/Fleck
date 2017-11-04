@@ -24,9 +24,9 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
     var timer : Timer?
     var nameLabel : UILabel?
     var profileImageView: UIImageView?
-    weak var chatController: ChatController?
-    weak var newMessageController: NewMessageController?
-    weak var loginController : LoginViewController?
+    var chatController: ChatController?
+    var newMessageController: NewMessageController?
+    var loginController : LoginViewController?
     
     
     //MARK: VIEWDIDLOAD
