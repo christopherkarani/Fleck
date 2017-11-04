@@ -25,8 +25,9 @@ class NewMessageController: UITableViewController {
         tableView.register(UserCell.self, forCellReuseIdentifier: cellID)
     }
     
+    
     func fetchUsers() {
-        let ref = FDNodeRef.shared.messagesNode()
+        let ref = FDNodeRef.shared.userNode()
         ref.observe(.childAdded) { (snapshot) in
             self.setupDictionary(withSnapshot: snapshot)
         }

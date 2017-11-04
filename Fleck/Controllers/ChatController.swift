@@ -8,6 +8,8 @@
 
 import UIKit
 import Firebase
+import MobileCoreServices
+import AVFoundation
 
 protocol ChatControllerDelegate: class {
     func performZoom(forSatringImage imageView: UIImageView)
@@ -175,7 +177,7 @@ class ChatController: UICollectionViewController {
         guard let uid = Auth.auth().currentUser?.uid, let toID = user?.id else {
             return
         }
-        let userMessageRef = Database.database().reference().child("user-messages").child(uid).child(toID)
+        let userMessageRef = FDNodeRef.shared.userMessagesNode(toChild: uid, anotherChild: toID)
         userMessageRef.observe(.childAdded) { (snapshot) in
             let messageID = snapshot.key
             let messageRef = Database.database().reference().child("messages").child(messageID)
@@ -315,7 +317,7 @@ extension ChatController {
     @objc func handleKeyboardDidShow() {
         let indexPath = IndexPath(item: messages.count - 1, section: 0)
         if messages.count >= 1 {
-            collectionView?.scrollToItem(at: indexPath, at: .top, animated: true)
+                collectionView?.scrollToItem(at: indexPath, at: .top, animated: true)
         }
      
     }
@@ -360,13 +362,21 @@ extension ChatController: UIImagePickerControllerDelegate, UINavigationControlle
         let picker = UIImagePickerController()
         picker.delegate = self
         picker.allowsEditing = true
+        picker.mediaTypes = [String(describing: kUTTypeImage) ,String(describing:kUTTypeMovie)]
         present(picker, animated: true, completion: nil)
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-        let imageData = handleSelectImage(withInfo: info)
-        let image = imageData.image
-        handleUploadToFirebase(withData: imageData.data, andImage: image)
+        if let videoUrl = info[UIImagePickerControllerMediaURL] as? URL {
+            //we selected a video
+            handleSelectedVideo(withUrl: videoUrl)
+        } else {
+            //we selected an image
+            let imageData = handleSelectImage(withInfo: info)
+            let image = imageData.image
+            handleUploadToFirebase(withData: data, andImage: imag, completion: nil)
+        }
+        
         
     }
     
@@ -384,7 +394,60 @@ extension ChatController: UIImagePickerControllerDelegate, UINavigationControlle
         return (imageData, selectedImage!)
     }
     
-    func handleUploadToFirebase(withData data: Data, andImage image: UIImage) {
+    func handleSelectedVideo(withUrl url: URL) {
+        self.dismiss(animated: true, completion: nil)
+            let fileName = "\(UUID().uuidString).mov"
+            let ref = Storage.storage().reference().child("Chat_Message_Videos").child(fileName)
+            let uploadTask = ref.putFile(from: url, metadata: nil, completion: { (metadata, error) in
+                
+                if error != nil {
+                    print(error!)
+                    return
+                }
+                
+
+
+                if let videoUrl = metadata?.downloadURL()?.absoluteString {
+                    if let thumbnailImage = self.thumbnail(forImageUrl: url) {
+                        //"imageUrl": urlString,
+                        let properties : [String: Any] =  ["videoUrl": videoUrl, "imageWidth": thumbnailImage.size.width, "imageHeight": thumbnailImage.size.height]
+                        self.sendMessage(withProperties: properties)
+                    }
+                    
+                    
+                }
+            })
+        
+        uploadTask.observe(.progress) { (snapshot) in
+            if let completedUnitCount = snapshot.progress?.completedUnitCount,
+                let totalUnitCount = snapshot.progress?.totalUnitCount {
+                let uploadPercentage : Float64 = Float64(completedUnitCount) * 100 / Float64(totalUnitCount)
+                
+                self.navigationItem.title = String(format: "%.0f", uploadPercentage) + " %"
+            }
+        }
+        
+        uploadTask.observe(.success) { (snapshot) in
+            self.navigationItem.title = self.user?.name
+        }
+        
+    }
+    
+    private func thumbnail(forImageUrl url : URL) -> UIImage? {
+        let asset = AVAsset(url: url)
+        let image = AVAssetImageGenerator(asset: asset)
+        
+        do {
+            let imageCGI = try image.copyCGImage(at: CMTime.init(value: 1, timescale: 60), actualTime: nil)
+            return UIImage(cgImage: imageCGI)
+        } catch let err {
+            print(err)
+        }
+        
+        return nil
+    }
+
+    func handleUploadToFirebase(withData data: Data, andImage image: UIImage, completion: ((_ imageUrl: String) -> Void)?) {
         let ref = FDNodeRef.shared.uploadMesaageImageNode(toStorage: true)
         ref.putData(data, metadata: nil) { (metadata, error) in
             if error != nil  {
@@ -392,8 +455,9 @@ extension ChatController: UIImagePickerControllerDelegate, UINavigationControlle
                 return
             }
             
-            if let imageUrl = metadata?.downloadURL()?.absoluteString {
-                self.handleSendImage(withUrlString: imageUrl, andImage: image)
+            if let urlString = metadata?.downloadURL()?.absoluteString {
+                completion?(urlString)
+                self.handleSendImage(withUrlString: urlString, andImage: image)
             }
             
             self.dismiss(animated: true, completion: nil)

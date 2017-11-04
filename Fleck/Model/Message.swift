@@ -17,6 +17,7 @@ struct Message {
     var imageUrl: String?
     var imageWidth: CGFloat?
     var imageHeight: CGFloat?
+    var videoUrl: String?
 
     
     func chatPartnerID() -> String? {
@@ -31,6 +32,7 @@ struct Message {
         self.imageUrl = dictionary["imageUrl"] as? String
         self.imageWidth = dictionary["imageWidth"] as? CGFloat
         self.imageHeight = dictionary["imageHeight"] as? CGFloat
+        self.videoUrl = dictionary["videoUrl"] as? String
         
     }
 }
