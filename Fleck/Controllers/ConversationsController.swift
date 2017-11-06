@@ -27,7 +27,7 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
     var chatController: ChatController?
     var newMessageController: NewMessageController?
     var loginController : LoginViewController?
-    
+    var isLoggedIn = false
     
     //MARK: VIEWDIDLOAD
     override func viewDidLoad() {
@@ -84,14 +84,20 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
     //MARK: VIEWDIDAPPEAR
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(true)
-        
+        if isLoggedIn == true {
+            observeUserMessages()
+        } else {
+            checkIfUserIsLoggedIn()
+        }
     }
     
     //MARK: USER LOGGED IN CHECK
     func checkIfUserIsLoggedIn() {
         if Auth.auth().currentUser?.uid == nil {
+            isLoggedIn = false
             perform(#selector(handleLogout), with: nil, afterDelay: 0)
         } else {
+            isLoggedIn = true
             fetchUserSetupNavigationBar()
         }
     }
@@ -118,7 +124,6 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
         messagesDictionary.removeAll()
         tableView.reloadData()
         observeUserMessages()
-        
         
         guard let profileImageURLString = user.profileImageURL else {
             print("Something went wrong while setting up Navigation Bar")
@@ -194,12 +199,14 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
         
         do {
             try Auth.auth().signOut()
+        
         } catch let logoutError {
             print(logoutError)
         }
         
         loginController = LoginViewController()
         loginController?.delegate = self
+        isLoggedIn = false
         present(loginController!, animated: true) {
             // Delete Keys from key chain.
             // End Session
@@ -223,6 +230,7 @@ extension ConversationsController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return messages.count
     }
+    
 }
 // Delegate Methods
 extension ConversationsController {
@@ -233,8 +241,10 @@ extension ConversationsController {
     private func fetchUserFromFirebase(withmessage message: Message) {
 
         guard let chatPartnerID = message.chatPartnerID() else {
+            assertionFailure("For some reason, the message does NOT contain chat partneriD")
             return
         }
+        
         let ref = FDNodeRef.shared.userNode(toChild: chatPartnerID)
         ref.observeSingleEvent(of: .value) { (snapshot) in
             guard let dictionary = snapshot.value as? [String: AnyObject] else {

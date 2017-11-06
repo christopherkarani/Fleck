@@ -7,9 +7,12 @@
 //
 
 import UIKit
+import AVFoundation
+import AVKit
 
 class ChatMessageCell: UICollectionViewCell {
     var chatDelegate : ChatControllerDelegate?
+    var message: Message?
     
     var textView: UITextView = {
         let tv = UITextView()
@@ -49,6 +52,30 @@ class ChatMessageCell: UICollectionViewCell {
         return view
     }()
     
+    lazy var playButton: UIButton = {
+       let button = UIButton(type: .system)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        let image = UIImage(named: "play")
+        button.setImage(image, for: .normal)
+        button.tintColor = .white
+        button.addTarget(self, action: #selector(handlePlay), for: .touchUpInside)
+        return button
+    }()
+    var playerLayer : AVPlayerLayer?
+    
+    @objc private func handlePlay() {
+        if let videoStringURL = message?.videoUrl {
+            guard let url = URL(string: videoStringURL) else { return }
+            let player = AVPlayer(url: url)
+            let playerController = AVPlayerViewController()
+            playerController.player = player
+            playButton.isHidden = true
+            chatDelegate?.presentViewControler(playerController, completion: {
+                playerController.player!.play()
+            })
+        }
+    }
+    
     
     @objc func handleZoom(withTap tap: UITapGestureRecognizer) {
         if let imageView = tap.view as? UIImageView {
@@ -84,6 +111,11 @@ class ChatMessageCell: UICollectionViewCell {
         messageImageView.topAnchor.constraint(equalTo: bubbleView.topAnchor).isActive = true
         messageImageView.widthAnchor.constraint(equalTo: bubbleView.widthAnchor).isActive = true
         messageImageView.heightAnchor.constraint(equalTo: bubbleView.heightAnchor).isActive = true
+        
+        playButton.centerXAnchor.constraint(equalTo: bubbleView.centerXAnchor).isActive = true
+        playButton.centerYAnchor.constraint(equalTo: bubbleView.centerYAnchor).isActive = true
+        playButton.widthAnchor.constraint(equalToConstant: 80).isActive = true
+        playButton.heightAnchor.constraint(equalToConstant: 80).isActive = true
     }
     
     func loadSubviews() {
@@ -92,6 +124,7 @@ class ChatMessageCell: UICollectionViewCell {
         addSubview(textView)
         addSubview(profileImageView)
         bubbleView.addSubview(messageImageView)
+        bubbleView.addSubview(playButton)
     }
     
     override init(frame: CGRect) {

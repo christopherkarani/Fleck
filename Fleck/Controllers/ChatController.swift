@@ -13,6 +13,7 @@ import AVFoundation
 
 protocol ChatControllerDelegate: class {
     func performZoom(forSatringImage imageView: UIImageView)
+    func presentViewControler(_ viewController: UIViewController, completion: @escaping () -> Void )
 }
 
 class ChatController: UICollectionViewController {
@@ -233,7 +234,7 @@ extension ChatController {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath) as! ChatMessageCell
         let message = messages[indexPath.item]
         cell.textView.text = message.text
-        
+        cell.message = message
         setupCell(withCell: cell, andMessage: message)
         
         if let text = message.text {
@@ -252,6 +253,9 @@ extension ChatController {
         if let profileImageURL = self.user?.profileImageURL {
             cell.profileImageView.loadImageUsingCache(withURLString: profileImageURL)
         }
+        
+        cell.playButton.isHidden = message.videoUrl == nil
+        
         if let messageURL = message.imageUrl {
             cell.bubbleView.backgroundColor = .clear
             cell.messageImageView.loadImageUsingCache(withURLString: messageURL)
@@ -473,10 +477,7 @@ extension ChatController: UIImagePickerControllerDelegate, UINavigationControlle
         let toID = user!.id!
         let fromID = Auth.auth().currentUser!.uid
         let timestamp = Int(Date().timeIntervalSince1970)
-        var values: [String : Any] = ["toID": toID,
-                                      "fromID": fromID,
-                                      "timestamp": timestamp,
-                                      ]
+        var values: [String : Any] = ["toID": toID, "fromID": fromID, "timestamp": timestamp,]
         properties.forEach({values[$0.key] = $0.value})
                                       
         childRef.updateChildValues(values) { (error, ref) in
@@ -501,6 +502,14 @@ extension ChatController: UIImagePickerControllerDelegate, UINavigationControlle
 
 //handle zoom on tap image
 extension ChatController: ChatControllerDelegate {
+    func presentViewControler(_ viewController: UIViewController, completion:  @escaping () -> Void) {
+        present(viewController, animated: true, completion: nil)
+        completion()
+    }
+    
+    //MARK: PRESENTVIEWCONTROLLER
+
+    
     func performZoom(forSatringImage imageView: UIImageView) {
         startingImageView = imageView
         startingImageView?.isHidden = true

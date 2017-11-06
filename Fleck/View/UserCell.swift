@@ -14,7 +14,8 @@ class UserCell: UITableViewCell {
     var message : Message? {
         didSet {
             setupNameAndProfileImage()
-            detailTextLabel?.text = message?.text
+            
+            checkType(forMessage: message!)
             if let seconds = message?.timeStamp {
                 let timeStampDate = Date(timeIntervalSince1970: TimeInterval(seconds))
                 let timeString = Date().timeAgoSinceDate(date: timeStampDate as NSDate, numericDates: false)
@@ -22,7 +23,15 @@ class UserCell: UITableViewCell {
             }
         }
     }
-    
+    private func checkType(forMessage message: Message) {
+        if message.videoUrl != nil {
+            detailTextLabel?.text = "🎥"
+        } else if message.imageUrl != nil {
+            detailTextLabel?.text = "📷"
+        } else {
+            detailTextLabel?.text = message.text
+        }
+    }
     
     
     func setupNameAndProfileImage() {
