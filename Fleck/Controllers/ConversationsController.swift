@@ -56,6 +56,10 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
                 self.fetchMessage(withMessageID: messageID)
             })
         }
+        ref.observe(.childRemoved) { (snapshot) in
+            self.messagesDictionary.removeValue(forKey: snapshot.key)
+            self.attemptToReloadTable()
+        }
     }
 
     @objc func handleReload() {
