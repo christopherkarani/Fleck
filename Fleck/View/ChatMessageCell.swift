@@ -11,7 +11,7 @@ import AVFoundation
 import AVKit
 
 class ChatMessageCell: UICollectionViewCell {
-    var chatDelegate : ChatControllerDelegate?
+    weak var chatDelegate : ChatControllerDelegate?
     var message: Message?
     
     var textView: UITextView = {
