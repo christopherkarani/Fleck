@@ -33,7 +33,6 @@ class UserCell: UITableViewCell {
         }
     }
     
-    
     func setupNameAndProfileImage() {
         if let id = message?.chatPartnerID() {
             let ref = Database.database().reference().child("users").child(id)

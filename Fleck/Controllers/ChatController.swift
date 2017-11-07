@@ -190,9 +190,10 @@ class ChatController: UICollectionViewController {
                 self.messages.append(message)
                 
                 DispatchQueue.main.async {
-                    self.collectionView?.reloadData()
+
                     let indexPath = IndexPath(item: self.messages.count - 1, section: 0)
                     if self.messages.count >= 1 {
+                        self.collectionView?.reloadData()
                         self.collectionView?.scrollToItem(at: indexPath, at: .bottom, animated: true)
                     }
          

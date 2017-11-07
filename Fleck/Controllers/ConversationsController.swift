@@ -24,21 +24,26 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
     var timer : Timer?
     var nameLabel : UILabel?
     var profileImageView: UIImageView?
-    var chatController: ChatController?
-    var newMessageController: NewMessageController?
+    let layout = UICollectionViewFlowLayout()
+    var chatController : ChatController?
+    var newMessageController : NewMessageController?
     var loginController : LoginViewController?
     var isLoggedIn = false
     
     //MARK: VIEWDIDLOAD
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        view.backgroundColor = .white
-        tableView.register(UserCell.self, forCellReuseIdentifier: cellID)
+        setupTableView()
         checkIfUserIsLoggedIn()
         setupNavigationItems()
         observeUserMessages()
   
+    }
+    
+    func setupTableView() {
+        view.backgroundColor = .white
+        tableView.register(UserCell.self, forCellReuseIdentifier: cellID)
+        tableView.allowsMultipleSelectionDuringEditing = true
     }
     
     func observeUserMessages() {
@@ -176,10 +181,11 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
     
     func showChatController(forUser user: LocalUser) {
         let layout = UICollectionViewFlowLayout()
-        self.chatController = ChatController(collectionViewLayout: layout)
-        chatController!.user = user
+        chatController = ChatController(collectionViewLayout: layout)
+        chatController?.user = user
         navigationController?.pushViewController(chatController!, animated: true)
     }
+       
     
     func setupNavigationItems() {
         let logoutButton = UIBarButtonItem(title: "Logout", style: .plain, target: self, action: #selector(handleLogout))
@@ -187,7 +193,7 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
         navigationItem.leftBarButtonItem = logoutButton
         navigationItem.rightBarButtonItem = composeButton
     }
-    //HEYYY!!!!
+    
     @objc func handleNewMessage() {
         newMessageController = NewMessageController()
         newMessageController?.conversationsDelegate = self
@@ -199,19 +205,15 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
         
         do {
             try Auth.auth().signOut()
-        
+            
         } catch let logoutError {
             print(logoutError)
         }
         
         loginController = LoginViewController()
-        loginController?.delegate = self
+        loginController!.delegate = self
         isLoggedIn = false
-        present(loginController!, animated: true) {
-            // Delete Keys from key chain.
-            // End Session
-            // Lock Screen
-        }
+        present(loginController!, animated: true, completion: nil)
     }
 
     override func didReceiveMemoryWarning() {
@@ -260,9 +262,30 @@ extension ConversationsController {
         }
     }
     
+    
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let message = messages[indexPath.row]
         fetchUserFromFirebase(withmessage: message)
+    }
+    
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        let message = messages[indexPath.row]
+        if let chatPartnerID = message.chatPartnerID() {
+            let ref = FDNodeRef.shared.userMessagesNode(toChild: FDNodeRef.currentUserUID, anotherChild: chatPartnerID)
+            ref.removeValue(completionBlock: { (error, ref) in
+                if error != nil {
+                    print("Something went wrong when trying to delete", error!)
+                }
+                
+                self.messagesDictionary.removeValue(forKey: chatPartnerID)
+                self.attemptToReloadTable()
+                
+            })
+        }
     }
 }
 
