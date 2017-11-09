@@ -44,6 +44,8 @@ extension LoginViewController: UIImagePickerControllerDelegate, UINavigationCont
 extension LoginViewController {
     //MARK: handle Login/Register Condition
     @objc func handleLoginRegister() {
+        loginRegisterButton.setTitle(nil, for: .normal)
+        activityIndicatorView.startAnimating()
         if loginRegisterSegementedControl.selectedSegmentIndex == 0 {
             handleLogin()
         } else {
@@ -61,14 +63,24 @@ extension LoginViewController {
             print("Invalid Password")
             return
         }
+
         Auth.auth().signIn(withEmail: email, password: password) { (user, error) in
             if error != nil {
                 print(error!)
+                self.activityIndicatorView.stopAnimating()
                 return
             }
             self.delegate?.fetchUserSetupNavigationBar()
-            self.dismiss(animated: true, completion: nil)
+            self.dismiss(animated: true, completion: {
+                self.activityIndicatorView.stopAnimating()
+                self.loginRegisterButton.setTitle(self.loginRegisterButtonTittle, for: .normal)
+            })
         }
+    }
+    
+    
+    fileprivate func stopAnimatingActivityIndicator() {
+        activityIndicatorView.stopAnimating()
     }
     
     //MARK: HandleRegister
@@ -90,6 +102,7 @@ extension LoginViewController {
             
             if error != nil {
                 print(error!)
+                self.activityIndicatorView.stopAnimating()
                 return
             }
             guard let uid = user?.uid else {
@@ -100,6 +113,7 @@ extension LoginViewController {
                 let uploadData = UIImageJPEGRepresentation(profileImage, 0.1) else {
                 print("Something Went wrong while trying to turn image to jpeg")
                 return
+                    
             }
 
             let storageRef = FDNodeRef.shared.profileImagesStorageRef(toStoragePath: true)
@@ -131,14 +145,26 @@ extension LoginViewController {
             user.profileImageURL = values["profileImageURL"]
             self.delegate?.setupNavigationBar(withUser: user)
             self.dismiss(animated: true, completion: nil)
+            self.dismiss(animated: true, completion: {
+                self.activityIndicatorView.stopAnimating()
+                self.loginRegisterButton.setTitle(self.loginRegisterButtonTittle, for: .normal)
+            })
         })
+    }
+    
+    fileprivate func handleLoginRegisterTitle(withIndex selectedIndex: Int) {
+        let title = loginRegisterSegementedControl.titleForSegment(at: selectedIndex)
+        if !(activityIndicatorView.isAnimating) {
+            loginRegisterButton.setTitle(title, for: .normal)
+        } else {
+            loginRegisterButton.titleLabel?.text = nil
+        }
     }
     
     /// handles the functionality of the segmented controller
     @objc func handleLoginRegisterSegmentChange() {
         let selectedIndex = loginRegisterSegementedControl.selectedSegmentIndex
-        let title = loginRegisterSegementedControl.titleForSegment(at: selectedIndex)
-        loginRegisterButton.setTitle(title, for: .normal)
+        handleLoginRegisterTitle(withIndex: selectedIndex)
         
         //change height of containerView
         inputContainerViewHeightAnchor?.constant = selectedIndex == 0 ? 100 : 150
@@ -164,6 +190,7 @@ extension LoginViewController {
         view.addSubview(loginRegisterButton)
         view.addSubview(profileImageSelector)
         view.addSubview(loginRegisterSegementedControl)
+        loginRegisterButton.addSubview(activityIndicatorView)
         
         func inputContainer() {
             inputContainerView.addSubview(nameTextField)
@@ -255,6 +282,7 @@ extension LoginViewController {
                 emailSeperatorLineUI.heightAnchor.constraint(equalToConstant: 1).isActive = true
             }
             
+            
             nameTextFieldConstraints()
             nameSeperatorLine()
             emailTextFieldConstraints()
@@ -263,10 +291,19 @@ extension LoginViewController {
             
         }
         
+        
+        func activityIndicatorContraints() {
+            activityIndicatorView.centerXAnchor.constraint(equalTo: loginRegisterButton.centerXAnchor).isActive = true
+            activityIndicatorView.centerYAnchor.constraint(equalTo: loginRegisterButton.centerYAnchor).isActive = true
+            activityIndicatorView.widthAnchor.constraint(equalToConstant: 30).isActive = true
+            activityIndicatorView.heightAnchor.constraint(equalToConstant: 30).isActive = true
+        }
+
         inputViewConstrainsts()
         loginRegisterButtonConstraints()
         textFieldConstraints()
         profileImageSelectorConstraints()
         segmentedControlConstraints()
+        activityIndicatorContraints()
     }
 }

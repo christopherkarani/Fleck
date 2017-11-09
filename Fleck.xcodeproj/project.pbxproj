@@ -19,6 +19,8 @@
 		BB18647F1FA2294100CAC6AD /* LocalUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB18647E1FA2294100CAC6AD /* LocalUser.swift */; };
 		BB1864821FA24F3400CAC6AD /* UserCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1864811FA24F3400CAC6AD /* UserCell.swift */; };
 		BB1864841FA2727500CAC6AD /* LoginController+Handlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1864831FA2727400CAC6AD /* LoginController+Handlers.swift */; };
+		BB90B3B71FB4F37800BEE4F3 /* FBNetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB90B3B61FB4F37800BEE4F3 /* FBNetworking.swift */; };
+		BB90B3B91FB4F48000BEE4F3 /* MessagesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB90B3B81FB4F48000BEE4F3 /* MessagesController.swift */; };
 		BB9BFEC31FB2094800EB0E87 /* InputContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9BFEC21FB2094800EB0E87 /* InputContainerView.swift */; };
 		BB9BFEC51FB210C400EB0E87 /* UserManageAble.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9BFEC41FB210C400EB0E87 /* UserManageAble.swift */; };
 		BBB909DA1FA7983E00A790B5 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB909D91FA7983E00A790B5 /* Message.swift */; };
@@ -47,6 +49,8 @@
 		BB18647E1FA2294100CAC6AD /* LocalUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalUser.swift; sourceTree = "<group>"; };
 		BB1864811FA24F3400CAC6AD /* UserCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCell.swift; sourceTree = "<group>"; };
 		BB1864831FA2727400CAC6AD /* LoginController+Handlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LoginController+Handlers.swift"; sourceTree = "<group>"; };
+		BB90B3B61FB4F37800BEE4F3 /* FBNetworking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FBNetworking.swift; sourceTree = "<group>"; };
+		BB90B3B81FB4F48000BEE4F3 /* MessagesController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesController.swift; sourceTree = "<group>"; };
 		BB9BFEC21FB2094800EB0E87 /* InputContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputContainerView.swift; sourceTree = "<group>"; };
 		BB9BFEC41FB210C400EB0E87 /* UserManageAble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserManageAble.swift; sourceTree = "<group>"; };
 		BBB909D91FA7983E00A790B5 /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
@@ -107,6 +111,7 @@
 				BBF81E691FA4CA4C00CFD93D /* Extensions.swift */,
 				BB1845891FAD104800DA1D9E /* FireBaseNetwork.swift */,
 				BB18458F1FAD11D000DA1D9E /* FDNodeRef.swift */,
+				BB90B3B61FB4F37800BEE4F3 /* FBNetworking.swift */,
 			);
 			path = Helper;
 			sourceTree = "<group>";
@@ -175,6 +180,7 @@
 				BB11DDFD1F9E5BCC004A2D2E /* NavigationController.swift */,
 				BB11DE011F9E5C63004A2D2E /* ConversationsController.swift */,
 				BB18647B1FA21DBB00CAC6AD /* NewMessageController.swift */,
+				BB90B3B81FB4F48000BEE4F3 /* MessagesController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -318,6 +324,8 @@
 				BB11DE001F9E5C1A004A2D2E /* ChatController.swift in Sources */,
 				BB9BFEC31FB2094800EB0E87 /* InputContainerView.swift in Sources */,
 				BB18458A1FAD104800DA1D9E /* FireBaseNetwork.swift in Sources */,
+				BB90B3B91FB4F48000BEE4F3 /* MessagesController.swift in Sources */,
+				BB90B3B71FB4F37800BEE4F3 /* FBNetworking.swift in Sources */,
 				BB9BFEC51FB210C400EB0E87 /* UserManageAble.swift in Sources */,
 				BB1864821FA24F3400CAC6AD /* UserCell.swift in Sources */,
 				BB11DE051F9E67A9004A2D2E /* Global.swift in Sources */,

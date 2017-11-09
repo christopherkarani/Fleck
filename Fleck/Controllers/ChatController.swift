@@ -46,7 +46,8 @@ class ChatController: UICollectionViewController, UserManageAble {
     lazy var inputContainerView : InputContainerView = {
         let containerView = InputContainerView()
         let viewHeight : CGFloat = 50
-        containerView.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: viewHeight)
+        let width = UIScreen.main.bounds.width
+        containerView.frame = CGRect(x: 0, y: 0, width: width, height: viewHeight)
         containerView.chatController = self
         containerView.chatDelegate = self
         return containerView
@@ -56,7 +57,6 @@ class ChatController: UICollectionViewController, UserManageAble {
     override func viewDidLoad() {
         super.viewDidLoad()
         collectionView?.contentInset = UIEdgeInsets(top: 8, left: 0, bottom: 8 , right: 0)
-    
         collectionView?.backgroundColor = .white
         collectionView?.register(ChatMessageCell.self, forCellWithReuseIdentifier: cellID)
         collectionView?.alwaysBounceVertical = true

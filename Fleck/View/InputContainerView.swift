@@ -63,12 +63,9 @@ class InputContainerView: UIView {
         
         addSubViews()
         setupConstraints()
+        chatDelegate?.testFunc();
     }
-    
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        chatDelegate?.testFunc()
-    }
-    
+
     deinit {
         print("Input View Deallocated")
     }

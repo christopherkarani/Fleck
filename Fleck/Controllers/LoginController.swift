@@ -94,8 +94,19 @@ class LoginViewController : UIViewController {
         return imageView
     }()
     
-
+    var activityIndicatorView : UIActivityIndicatorView = {
+        let activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
+        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+        activityIndicator.color = .darkGray
+        return activityIndicator
+    }()
     
+    var loginRegisterButtonTittle : String {
+        return loginRegisterSegementedControl.selectedSegmentIndex == 0 ? "Login" : "Register"
+    }
+    
+
+
     //MARK: SEGMENTED CONTROL
     lazy var loginRegisterSegementedControl : UISegmentedControl = {
         let control = UISegmentedControl(items: ["Login", "Register"])

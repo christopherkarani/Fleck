@@ -34,10 +34,8 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTableView()
-        checkIfUserIsLoggedIn()
+        checkIfUserIsLoggedIn() ? observeUserMessages() : perform(#selector(handleLogout), with: nil, afterDelay: 0)
         setupNavigationItems()
-        observeUserMessages()
-  
     }
     
     func setupTableView() {
@@ -93,21 +91,19 @@ class ConversationsController: UITableViewController, ConversationsControllerDel
     //MARK: VIEWDIDAPPEAR
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(true)
-        if isLoggedIn == true {
-            observeUserMessages()
-        } else {
-            checkIfUserIsLoggedIn()
-        }
+        checkIfUserIsLoggedIn() ? observeUserMessages() : perform(#selector(handleLogout), with: nil, afterDelay: 0)
     }
     
     //MARK: USER LOGGED IN CHECK
-    func checkIfUserIsLoggedIn() {
+    func checkIfUserIsLoggedIn() -> Bool  {
         if Auth.auth().currentUser?.uid == nil {
             isLoggedIn = false
             perform(#selector(handleLogout), with: nil, afterDelay: 0)
+            return false
         } else {
             isLoggedIn = true
             fetchUserSetupNavigationBar()
+            return true
         }
     }
     func fetchUserSetupNavigationBar() {
