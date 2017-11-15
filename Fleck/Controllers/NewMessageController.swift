@@ -23,6 +23,8 @@ class NewMessageController: UITableViewController {
         tableView.dataSource = self
         setupNavigationItem()
         tableView.register(UserCell.self, forCellReuseIdentifier: cellID)
+        
+        
     }
     
     
